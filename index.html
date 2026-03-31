@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Key Levels Grid — Daily Brief</title>
+
+<!--
+=================================================================
+  KEY LEVELS GRID — Daily Market Brief
+  Grille quotidienne de niveaux clés ICT/SMC
+  Fichier HTML autonome · localStorage · Responsive
+=================================================================
+-->
+
+<style>
+/* ================================================================
+   VARIABLES
+================================================================ */
+:root {
+  --bg-0:  #07090e;
+  --bg-1:  #0b0f17;
+  --bg-2:  #0f1520;
+  --bg-3:  #141c2b;
+  --bg-4:  #192233;
+  --bg-5:  #1e293b;
+
+  --border:       #1a2540;
+  --border-mid:   #223050;
+  --border-light: #2d3f60;
+
+  --t1: #dde6f5;
+  --t2: #6b84a8;
+  --t3: #3a4f6e;
+  --t4: #1e2d42;
+
+  /* Accents directionnels */
+  --bull:    #22c55e;
+  --bull-d:  rgba(34,197,94,.09);
+  --bull-b:  rgba(34,197,94,.18);
+  --bear:    #ef4444;
+  --bear-d:  rgba(239,68,68,.09);
+  --bear-b:  rgba(239,68,68,.18);
+  --neut:    #64748b;
+  --neut-d:  rgba(100,116,139,.09);
+
+  --blue:    #3b82f6;
+  --blue-d:  rgba(59,130,246,.10);
+  --amber:   #f59e0b;
+  --amber-d: rgba(245,158,11,.09);
+  --violet:  #a78bfa;
+  --violet-d:rgba(167,139,250,.09);
+
+  /* Couleurs des niveaux */
+  --lvl-res:    #f87171;   /* Résistance */
+  --lvl-sup:    #4ade80;   /* Support     */
+  --lvl-ob:     #fb923c;   /* OB          */
+  --lvl-fvg:    #facc15;   /* FVG         */
+  --lvl-liq:    #a78bfa;   /* Liquidité   */
+  --lvl-eq:     #38bdf8;   /* EQ / 50%    */
+  --lvl-pdh:    #f472b6;   /* PDH/PDL     */
+  --lvl-other:  #94a3b8;   /* Autre       */
+
+  /* Actifs */
+  --xau:  #f59e0b;
+  --btc:  #f97316;
+  --sp5:  #22c55e;
+  --wti:  #6366f1;
+  --dxy:  #3b82f6;
+  --cus:  #a78bfa;
+
+  --font-ui:   'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+
+  --radius:    9px;
+  --radius-lg: 13px;
+  --t: 130ms ease;
+}
+
+/* ================================================================
+   RESET
+================================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--bg-0);
+  color: var(--t1);
+  font-family: var(--font-ui);
+  min-height: 100vh;
+  padding: 14px 10px 48px;
+  background-image:
+    radial-gradient(ellipse 120% 40% at 50% 0%, rgba(59,130,246,.04) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 30% at 80% 100%, rgba(167,139,250,.03) 0%, transparent 50%);
+}
+
+/* ================================================================
+   PAGE LAYOUT
+================================================================ */
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ================================================================
+   HEADER
+================================================================ */
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 18px 20px 16px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  gap: 16px;
+}
+
+.header-left {}
+
+.header-eyebrow {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 5px;
+}
+
+.header-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--t1);
+  letter-spacing: -.018em;
+  line-height: 1.2;
+}
+
+.header-sub {
+  font-size: .73rem;
+  color: var(--t2);
+  margin-top: 3px;
+}
+
+.header-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.header-date {
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  color: var(--t1);
+  font-weight: 600;
+}
+
+.header-time {
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  color: var(--t2);
+  margin-top: 2px;
+}
+
+.header-week {
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  color: var(--t3);
+  margin-top: 2px;
+}
+
+/* ================================================================
+   ACTIONS GLOBALES
+================================================================ */
+.global-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: .75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid;
+  transition: opacity var(--t), background var(--t), color var(--t), border-color var(--t);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active { opacity: .65; }
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--border-mid);
+  color: var(--t2);
+}
+.btn-ghost:hover { border-color: var(--border-light); color: var(--t1); }
+
+.btn-danger {
+  background: transparent;
+  border-color: var(--border-mid);
+  color: var(--t3);
+}
+.btn-danger:hover {
+  border-color: rgba(239,68,68,.4);
+  color: var(--bear);
+  background: var(--bear-d);
+}
+
+.btn-primary {
+  background: var(--blue-d);
+  border-color: rgba(59,130,246,.3);
+  color: var(--blue);
+}
+.btn-primary:hover { background: rgba(59,130,246,.18); }
+
+/* ================================================================
+   ASSET CARDS
+================================================================ */
+.asset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 620px) {
+  .asset-grid { grid-template-columns: 1fr; }
+}
+
+.asset-card {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Couleur accent sur le bord gauche selon actif */
+.asset-card[data-asset="XAU"]  { border-left: 3px solid var(--xau); }
+.asset-card[data-asset="BTC"]  { border-left: 3px solid var(--btc); }
+.asset-card[data-asset="SP5"]  { border-left: 3px solid var(--sp5); }
+.asset-card[data-asset="WTI"]  { border-left: 3px solid var(--wti); }
+.asset-card[data-asset="DXY"]  { border-left: 3px solid var(--dxy); }
+.asset-card[data-asset="CUS"]  { border-left: 3px solid var(--cus); }
+
+/* ── Card header ── */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px 10px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-2);
+}
+
+.asset-pill {
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  padding: 3px 9px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.asset-card[data-asset="XAU"] .asset-pill { color: var(--xau); background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.22); }
+.asset-card[data-asset="BTC"] .asset-pill { color: var(--btc); background: rgba(249,115,22,.12); border: 1px solid rgba(249,115,22,.22); }
+.asset-card[data-asset="SP5"] .asset-pill { color: var(--sp5); background: rgba(34,197,94,.10); border: 1px solid rgba(34,197,94,.20); }
+.asset-card[data-asset="WTI"] .asset-pill { color: var(--wti); background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.22); }
+.asset-card[data-asset="DXY"] .asset-pill { color: var(--dxy); background: rgba(59,130,246,.12); border: 1px solid rgba(59,130,246,.22); }
+.asset-card[data-asset="CUS"] .asset-pill { color: var(--cus); background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.22); }
+
+.asset-fullname {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--t1);
+  flex: 1;
+}
+
+/* Champ nom custom pour "Autre" */
+.asset-custom-name {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-mid);
+  color: var(--t1);
+  font-family: var(--font-ui);
+  font-size: .8rem;
+  font-weight: 600;
+  width: 120px;
+  outline: none;
+  padding: 1px 4px;
+}
+.asset-custom-name::placeholder { color: var(--t3); }
+.asset-custom-name:focus { border-bottom-color: var(--blue); }
+
+/* ── Card body ── */
+.card-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+/* ================================================================
+   SECTION BIAS HTF
+================================================================ */
+.bias-section {}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: .58rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 7px;
+}
+
+.bias-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
+.bias-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bias-tf-label {
+  font-family: var(--font-mono);
+  font-size: .58rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--t3);
+  text-align: center;
+}
+
+/* Sélecteur bias : Bullish / Bearish / Neutre / NA */
+.bias-select {
+  appearance: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-3);
+  color: var(--t2);
+  font-family: var(--font-mono);
+  font-size: .67rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 6px 4px;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--t);
+  width: 100%;
+}
+
+.bias-select:focus { border-color: var(--border-light); }
+
+.bias-select.bull { background: var(--bull-d); border-color: rgba(34,197,94,.3); color: var(--bull); }
+.bias-select.bear { background: var(--bear-d); border-color: rgba(239,68,68,.3); color: var(--bear); }
+.bias-select.neut { background: var(--neut-d); border-color: rgba(100,116,139,.3); color: var(--neut); }
+
+/* ================================================================
+   STATE D — DYNAMIQUE DU PRIX
+================================================================ */
+.stated-section {}
+
+.stated-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.stated-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stated-cell-label {
+  font-family: var(--font-mono);
+  font-size: .58rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+
+.select-field, .input-field {
+  appearance: none;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--t1);
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  padding: 7px 9px;
+  outline: none;
+  width: 100%;
+  transition: border-color var(--t);
+}
+
+.select-field:focus, .input-field:focus { border-color: var(--border-light); }
+.select-field option { background: #0b0f17; }
+
+/* ================================================================
+   NIVEAUX CLÉS — TABLE
+================================================================ */
+.levels-section {}
+
+.levels-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+}
+
+.btn-add-level {
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  color: var(--blue);
+  background: var(--blue-d);
+  border: 1px solid rgba(59,130,246,.2);
+  border-radius: 5px;
+  padding: 3px 9px;
+  cursor: pointer;
+  transition: all var(--t);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-add-level:hover { background: rgba(59,130,246,.18); }
+
+.levels-table {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Ligne de niveau */
+.level-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 90px 28px;
+  gap: 5px;
+  align-items: center;
+}
+
+/* Type de niveau (OB / FVG / Résistance…) */
+.level-type-select {
+  appearance: none;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--t2);
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  font-weight: 600;
+  padding: 6px 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all var(--t);
+  width: 100%;
+  text-align: center;
+}
+
+.level-type-select:focus { border-color: var(--border-light); }
+.level-type-select option { background: #0b0f17; }
+
+/* Couleur selon type */
+.level-type-select[data-type="RES"]   { color: var(--lvl-res); border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.06); }
+.level-type-select[data-type="SUP"]   { color: var(--lvl-sup); border-color: rgba(74,222,128,.25);  background: rgba(74,222,128,.06); }
+.level-type-select[data-type="OB"]    { color: var(--lvl-ob);  border-color: rgba(251,146,60,.25);  background: rgba(251,146,60,.06); }
+.level-type-select[data-type="FVG"]   { color: var(--lvl-fvg); border-color: rgba(250,204,21,.25);  background: rgba(250,204,21,.06); }
+.level-type-select[data-type="IFVG"]  { color: var(--lvl-fvg); border-color: rgba(250,204,21,.18);  background: rgba(250,204,21,.04); }
+.level-type-select[data-type="LIQ"]   { color: var(--lvl-liq); border-color: rgba(167,139,250,.25); background: rgba(167,139,250,.06); }
+.level-type-select[data-type="EQ"]    { color: var(--lvl-eq);  border-color: rgba(56,189,248,.25);  background: rgba(56,189,248,.06); }
+.level-type-select[data-type="PDH"]   { color: var(--lvl-pdh); border-color: rgba(244,114,182,.25); background: rgba(244,114,182,.06); }
+.level-type-select[data-type="PWH"]   { color: var(--lvl-pdh); border-color: rgba(244,114,182,.20); background: rgba(244,114,182,.04); }
+.level-type-select[data-type="OTHER"] { color: var(--lvl-other); }
+
+/* Prix */
+.level-price-input {
+  background: var(--bg-4);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--t1);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  font-weight: 600;
+  padding: 6px 8px;
+  outline: none;
+  width: 100%;
+  transition: border-color var(--t);
+  text-align: right;
+}
+
+.level-price-input:focus { border-color: var(--border-light); }
+.level-price-input::placeholder { color: var(--t4); font-size: .7rem; }
+
+/* TF du niveau */
+.level-tf-select {
+  appearance: none;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--t2);
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  padding: 6px 4px;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: border-color var(--t);
+}
+
+.level-tf-select:focus { border-color: var(--border-light); }
+.level-tf-select option { background: #0b0f17; }
+
+/* Supprimer un niveau */
+.btn-del-level {
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--t4);
+  font-size: .8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--t);
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-del-level:hover {
+  color: var(--bear);
+  border-color: rgba(239,68,68,.3);
+  background: var(--bear-d);
+}
+
+/* ================================================================
+   NOTE LIBRE PAR ACTIF
+================================================================ */
+.asset-note {
+  resize: none;
+  min-height: 52px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--t2);
+  font-family: var(--font-ui);
+  font-size: .75rem;
+  line-height: 1.45;
+  padding: 8px 10px;
+  outline: none;
+  width: 100%;
+  transition: border-color var(--t), color var(--t);
+}
+.asset-note::placeholder { color: var(--t4); }
+.asset-note:focus { border-color: var(--border-light); color: var(--t1); }
+
+/* ================================================================
+   SECTION RÉSUMÉ GLOBAL / CORRELATIONS
+================================================================ */
+.summary-card {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.summary-title {
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--t2);
+}
+
+.toggle-icon {
+  font-size: .75rem;
+  color: var(--t3);
+  transition: transform var(--t);
+}
+
+.summary-card.open .toggle-icon { transform: rotate(180deg); }
+
+.summary-body {
+  display: none;
+  padding: 14px 16px;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.summary-card.open .summary-body { display: flex; }
+
+/* Tableau récapitulatif des bias */
+.bias-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+}
+
+.bias-summary-table th {
+  text-align: left;
+  color: var(--t3);
+  font-size: .6rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.bias-summary-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--t2);
+}
+
+.bias-summary-table tr:last-child td { border-bottom: none; }
+
+.bias-summary-table .asset-col {
+  font-weight: 700;
+  color: var(--t1);
+}
+
+.summary-note-label {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 5px;
+}
+
+.summary-note {
+  resize: vertical;
+  min-height: 64px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--t2);
+  font-family: var(--font-ui);
+  font-size: .78rem;
+  line-height: 1.5;
+  padding: 9px 11px;
+  outline: none;
+  width: 100%;
+  transition: border-color var(--t), color var(--t);
+}
+.summary-note::placeholder { color: var(--t4); }
+.summary-note:focus { border-color: var(--border-light); color: var(--t1); }
+
+/* ================================================================
+   TOAST
+================================================================ */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(70px);
+  background: var(--bg-4);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius);
+  color: var(--t1);
+  font-family: var(--font-mono);
+  font-size: .73rem;
+  padding: 9px 18px;
+  white-space: nowrap;
+  transition: transform 280ms cubic-bezier(.16,1,.3,1);
+  z-index: 9999;
+  pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ================================================================
+   RESPONSIVE
+================================================================ */
+@media (max-width: 480px) {
+  body { padding: 10px 8px 40px; }
+  .site-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .header-right { text-align: left; }
+  .level-row { grid-template-columns: 58px 1fr 70px 26px; }
+}
+</style>
+
+</head>
+
+<body>
+<div class="page">
+
+<!-- ================================================================
+     HEADER
+================================================================ -->
+
+<header class="site-header">
+  <div class="header-left">
+    <div class="header-eyebrow">ICT · SMC · Daily Brief</div>
+    <div class="header-title">Key Levels Grid</div>
+    <div class="header-sub">Grille quotidienne de niveaux clés &amp; dynamique du prix</div>
+  </div>
+  <div class="header-right">
+    <div class="header-date" id="hdr-date">—</div>
+    <div class="header-time" id="hdr-time">—</div>
+    <div class="header-week" id="hdr-week">—</div>
+  </div>
+</header>
+
+<!-- ================================================================
+     ACTIONS GLOBALES
+================================================================ -->
+
+<div class="global-actions">
+  <button class="btn btn-primary" id="btn-save">&#10003;&nbsp; Sauvegarder</button>
+  <button class="btn btn-ghost"   id="btn-export">&#8615;&nbsp; Exporter texte</button>
+  <button class="btn btn-danger"  id="btn-reset">&#8635;&nbsp; Nouvelle session</button>
+</div>
+
+<!-- ================================================================
+     GRILLE ACTIFS
+================================================================ -->
+
+<div class="asset-grid" id="asset-grid">
+
+  <!-- GOLD -->
+
+  <div class="asset-card" data-asset="XAU" id="card-XAU">
+    <div class="card-header">
+      <span class="asset-pill">XAU/USD</span>
+      <span class="asset-fullname">Gold</span>
+    </div>
+    <div class="card-body">
+
+```
+  <!-- Bias HTF -->
+  <div class="bias-section">
+    <div class="section-label">Bias HTF</div>
+    <div class="bias-row" data-asset="XAU">
+      <div class="bias-cell">
+        <div class="bias-tf-label">Monthly</div>
+        <select class="bias-select" data-tf="M" data-asset="XAU">
+          <option value="">—</option>
+          <option value="bull">&#9650; Bull</option>
+          <option value="bear">&#9660; Bear</option>
+          <option value="neut">&#9632; Neut</option>
+        </select>
+      </div>
+      <div class="bias-cell">
+        <div class="bias-tf-label">Weekly</div>
+        <select class="bias-select" data-tf="W" data-asset="XAU">
+          <option value="">—</option>
+          <option value="bull">&#9650; Bull</option>
+          <option value="bear">&#9660; Bear</option>
+          <option value="neut">&#9632; Neut</option>
+        </select>
+      </div>
+      <div class="bias-cell">
+        <div class="bias-tf-label">Daily</div>
+        <select class="bias-select" data-tf="D" data-asset="XAU">
+          <option value="">—</option>
+          <option value="bull">&#9650; Bull</option>
+          <option value="bear">&#9660; Bear</option>
+          <option value="neut">&#9632; Neut</option>
+        </select>
+      </div>
+      <div class="bias-cell">
+        <div class="bias-tf-label">H4</div>
+        <select class="bias-select" data-tf="H4" data-asset="XAU">
+          <option value="">—</option>
+          <option value="bull">&#9650; Bull</option>
+          <option value="bear">&#9660; Bear</option>
+          <option value="neut">&#9632; Neut</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- State D -->
+  <div class="stated-section">
+    <div class="section-label">State D — Dynamique du prix</div>
+    <div class="stated-row">
+      <div class="stated-cell">
+        <div class="stated-cell-label">Structure</div>
+        <select class="select-field" data-field="structure" data-asset="XAU">
+          <option value="">—</option>
+          <option value="BOS haussier">BOS Haussier</option>
+          <option value="BOS baissier">BOS Baissier</option>
+          <option value="CHoCH haussier">CHoCH Haussier</option>
+          <option value="CHoCH baissier">CHoCH Baissier</option>
+          <option value="Range consolidation">Range / Consolidation</option>
+          <option value="Distribution">Distribution</option>
+          <option value="Accumulation">Accumulation</option>
+        </select>
+      </div>
+      <div class="stated-cell">
+        <div class="stated-cell-label">Phase de marché</div>
+        <select class="select-field" data-field="phase" data-asset="XAU">
+          <option value="">—</option>
+          <option value="Expansion">Expansion</option>
+          <option value="Retracement">Retracement</option>
+          <option value="Reversal">Reversal</option>
+          <option value="Consolidation">Consolidation</option>
+          <option value="Range">Range</option>
+        </select>
+      </div>
+      <div class="stated-cell">
+        <div class="stated-cell-label">Zone de prix</div>
+        <select class="select-field" data-field="zone" data-asset="XAU">
+          <option value="">—</option>
+          <option value="Premium">Premium</option>
+          <option value="Equilibrium">Equilibrium (50%)</option>
+          <option value="Discount">Discount</option>
+        </select>
+      </div>
+      <div class="stated-cell">
+        <div class="stated-cell-label">Cible prioritaire</div>
+        <input type="text" class="input-field" data-field="target" data-asset="XAU" placeholder="Ex : 2650"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Niveaux clés -->
+  <div class="levels-section">
+    <div class="levels-header">
+      <div class="section-label" style="margin:0">Niveaux clés actifs</div>
+      <button class="btn-add-level" data-asset="XAU">+ Ajouter</button>
+    </div>
+    <div class="levels-table" id="levels-XAU"></div>
+  </div>
+
+  <!-- Note -->
+  <textarea class="asset-note" data-field="note" data-asset="XAU" placeholder="Notes libres : contexte, invalidation, observations…" rows="2"></textarea>
+
+</div>
+```
+
+  </div><!-- /XAU -->
+
+  <!-- BTC -->
+
+  <div class="asset-card" data-asset="BTC" id="card-BTC">
+    <div class="card-header">
+      <span class="asset-pill">BTC/USD</span>
+      <span class="asset-fullname">Bitcoin</span>
+    </div>
+    <div class="card-body">
+      <div class="bias-section">
+        <div class="section-label">Bias HTF</div>
+        <div class="bias-row" data-asset="BTC">
+          <div class="bias-cell">
+            <div class="bias-tf-label">Monthly</div>
+            <select class="bias-select" data-tf="M" data-asset="BTC">
+              <option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option>
+            </select>
+          </div>
+          <div class="bias-cell">
+            <div class="bias-tf-label">Weekly</div>
+            <select class="bias-select" data-tf="W" data-asset="BTC">
+              <option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option>
+            </select>
+          </div>
+          <div class="bias-cell">
+            <div class="bias-tf-label">Daily</div>
+            <select class="bias-select" data-tf="D" data-asset="BTC">
+              <option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option>
+            </select>
+          </div>
+          <div class="bias-cell">
+            <div class="bias-tf-label">H4</div>
+            <select class="bias-select" data-tf="H4" data-asset="BTC">
+              <option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="stated-section">
+        <div class="section-label">State D — Dynamique du prix</div>
+        <div class="stated-row">
+          <div class="stated-cell">
+            <div class="stated-cell-label">Structure</div>
+            <select class="select-field" data-field="structure" data-asset="BTC">
+              <option value="">—</option><option>BOS Haussier</option><option>BOS Baissier</option><option>CHoCH Haussier</option><option>CHoCH Baissier</option><option>Range / Consolidation</option><option>Distribution</option><option>Accumulation</option>
+            </select>
+          </div>
+          <div class="stated-cell">
+            <div class="stated-cell-label">Phase de marché</div>
+            <select class="select-field" data-field="phase" data-asset="BTC">
+              <option value="">—</option><option>Expansion</option><option>Retracement</option><option>Reversal</option><option>Consolidation</option><option>Range</option>
+            </select>
+          </div>
+          <div class="stated-cell">
+            <div class="stated-cell-label">Zone de prix</div>
+            <select class="select-field" data-field="zone" data-asset="BTC">
+              <option value="">—</option><option>Premium</option><option>Equilibrium (50%)</option><option>Discount</option>
+            </select>
+          </div>
+          <div class="stated-cell">
+            <div class="stated-cell-label">Cible prioritaire</div>
+            <input type="text" class="input-field" data-field="target" data-asset="BTC" placeholder="Ex : 72000"/>
+          </div>
+        </div>
+      </div>
+      <div class="levels-section">
+        <div class="levels-header">
+          <div class="section-label" style="margin:0">Niveaux clés actifs</div>
+          <button class="btn-add-level" data-asset="BTC">+ Ajouter</button>
+        </div>
+        <div class="levels-table" id="levels-BTC"></div>
+      </div>
+      <textarea class="asset-note" data-field="note" data-asset="BTC" placeholder="Notes libres…" rows="2"></textarea>
+    </div>
+  </div><!-- /BTC -->
+
+  <!-- SP500 -->
+
+  <div class="asset-card" data-asset="SP5" id="card-SP5">
+    <div class="card-header">
+      <span class="asset-pill">SP500</span>
+      <span class="asset-fullname">S&amp;P 500 / US500</span>
+    </div>
+    <div class="card-body">
+      <div class="bias-section">
+        <div class="section-label">Bias HTF</div>
+        <div class="bias-row" data-asset="SP5">
+          <div class="bias-cell"><div class="bias-tf-label">Monthly</div>
+            <select class="bias-select" data-tf="M" data-asset="SP5"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">Weekly</div>
+            <select class="bias-select" data-tf="W" data-asset="SP5"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">Daily</div>
+            <select class="bias-select" data-tf="D" data-asset="SP5"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">H4</div>
+            <select class="bias-select" data-tf="H4" data-asset="SP5"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="stated-section">
+        <div class="section-label">State D — Dynamique du prix</div>
+        <div class="stated-row">
+          <div class="stated-cell"><div class="stated-cell-label">Structure</div>
+            <select class="select-field" data-field="structure" data-asset="SP5"><option value="">—</option><option>BOS Haussier</option><option>BOS Baissier</option><option>CHoCH Haussier</option><option>CHoCH Baissier</option><option>Range / Consolidation</option><option>Distribution</option><option>Accumulation</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Phase de marché</div>
+            <select class="select-field" data-field="phase" data-asset="SP5"><option value="">—</option><option>Expansion</option><option>Retracement</option><option>Reversal</option><option>Consolidation</option><option>Range</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Zone de prix</div>
+            <select class="select-field" data-field="zone" data-asset="SP5"><option value="">—</option><option>Premium</option><option>Equilibrium (50%)</option><option>Discount</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Cible prioritaire</div>
+            <input type="text" class="input-field" data-field="target" data-asset="SP5" placeholder="Ex : 5350"/>
+          </div>
+        </div>
+      </div>
+      <div class="levels-section">
+        <div class="levels-header">
+          <div class="section-label" style="margin:0">Niveaux clés actifs</div>
+          <button class="btn-add-level" data-asset="SP5">+ Ajouter</button>
+        </div>
+        <div class="levels-table" id="levels-SP5"></div>
+      </div>
+      <textarea class="asset-note" data-field="note" data-asset="SP5" placeholder="Notes libres…" rows="2"></textarea>
+    </div>
+  </div><!-- /SP5 -->
+
+  <!-- WTI -->
+
+  <div class="asset-card" data-asset="WTI" id="card-WTI">
+    <div class="card-header">
+      <span class="asset-pill">WTI</span>
+      <span class="asset-fullname">Crude Oil</span>
+    </div>
+    <div class="card-body">
+      <div class="bias-section">
+        <div class="section-label">Bias HTF</div>
+        <div class="bias-row" data-asset="WTI">
+          <div class="bias-cell"><div class="bias-tf-label">Monthly</div>
+            <select class="bias-select" data-tf="M" data-asset="WTI"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">Weekly</div>
+            <select class="bias-select" data-tf="W" data-asset="WTI"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">Daily</div>
+            <select class="bias-select" data-tf="D" data-asset="WTI"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">H4</div>
+            <select class="bias-select" data-tf="H4" data-asset="WTI"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="stated-section">
+        <div class="section-label">State D — Dynamique du prix</div>
+        <div class="stated-row">
+          <div class="stated-cell"><div class="stated-cell-label">Structure</div>
+            <select class="select-field" data-field="structure" data-asset="WTI"><option value="">—</option><option>BOS Haussier</option><option>BOS Baissier</option><option>CHoCH Haussier</option><option>CHoCH Baissier</option><option>Range / Consolidation</option><option>Distribution</option><option>Accumulation</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Phase de marché</div>
+            <select class="select-field" data-field="phase" data-asset="WTI"><option value="">—</option><option>Expansion</option><option>Retracement</option><option>Reversal</option><option>Consolidation</option><option>Range</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Zone de prix</div>
+            <select class="select-field" data-field="zone" data-asset="WTI"><option value="">—</option><option>Premium</option><option>Equilibrium (50%)</option><option>Discount</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Cible prioritaire</div>
+            <input type="text" class="input-field" data-field="target" data-asset="WTI" placeholder="Ex : 78.50"/>
+          </div>
+        </div>
+      </div>
+      <div class="levels-section">
+        <div class="levels-header">
+          <div class="section-label" style="margin:0">Niveaux clés actifs</div>
+          <button class="btn-add-level" data-asset="WTI">+ Ajouter</button>
+        </div>
+        <div class="levels-table" id="levels-WTI"></div>
+      </div>
+      <textarea class="asset-note" data-field="note" data-asset="WTI" placeholder="Notes libres…" rows="2"></textarea>
+    </div>
+  </div><!-- /WTI -->
+
+  <!-- DXY -->
+
+  <div class="asset-card" data-asset="DXY" id="card-DXY">
+    <div class="card-header">
+      <span class="asset-pill">DXY</span>
+      <span class="asset-fullname">Dollar Index</span>
+    </div>
+    <div class="card-body">
+      <div class="bias-section">
+        <div class="section-label">Bias HTF</div>
+        <div class="bias-row" data-asset="DXY">
+          <div class="bias-cell"><div class="bias-tf-label">Monthly</div>
+            <select class="bias-select" data-tf="M" data-asset="DXY"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">Weekly</div>
+            <select class="bias-select" data-tf="W" data-asset="DXY"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">Daily</div>
+            <select class="bias-select" data-tf="D" data-asset="DXY"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">H4</div>
+            <select class="bias-select" data-tf="H4" data-asset="DXY"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="stated-section">
+        <div class="section-label">State D — Dynamique du prix</div>
+        <div class="stated-row">
+          <div class="stated-cell"><div class="stated-cell-label">Structure</div>
+            <select class="select-field" data-field="structure" data-asset="DXY"><option value="">—</option><option>BOS Haussier</option><option>BOS Baissier</option><option>CHoCH Haussier</option><option>CHoCH Baissier</option><option>Range / Consolidation</option><option>Distribution</option><option>Accumulation</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Phase de marché</div>
+            <select class="select-field" data-field="phase" data-asset="DXY"><option value="">—</option><option>Expansion</option><option>Retracement</option><option>Reversal</option><option>Consolidation</option><option>Range</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Zone de prix</div>
+            <select class="select-field" data-field="zone" data-asset="DXY"><option value="">—</option><option>Premium</option><option>Equilibrium (50%)</option><option>Discount</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Cible prioritaire</div>
+            <input type="text" class="input-field" data-field="target" data-asset="DXY" placeholder="Ex : 104.20"/>
+          </div>
+        </div>
+      </div>
+      <div class="levels-section">
+        <div class="levels-header">
+          <div class="section-label" style="margin:0">Niveaux clés actifs</div>
+          <button class="btn-add-level" data-asset="DXY">+ Ajouter</button>
+        </div>
+        <div class="levels-table" id="levels-DXY"></div>
+      </div>
+      <textarea class="asset-note" data-field="note" data-asset="DXY" placeholder="Notes libres…" rows="2"></textarea>
+    </div>
+  </div><!-- /DXY -->
+
+  <!-- CUSTOM -->
+
+  <div class="asset-card" data-asset="CUS" id="card-CUS">
+    <div class="card-header">
+      <span class="asset-pill">AUTRE</span>
+      <input type="text" class="asset-custom-name" id="custom-ticker" placeholder="Ticker / Nom…" maxlength="20"/>
+    </div>
+    <div class="card-body">
+      <div class="bias-section">
+        <div class="section-label">Bias HTF</div>
+        <div class="bias-row" data-asset="CUS">
+          <div class="bias-cell"><div class="bias-tf-label">Monthly</div>
+            <select class="bias-select" data-tf="M" data-asset="CUS"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">Weekly</div>
+            <select class="bias-select" data-tf="W" data-asset="CUS"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">Daily</div>
+            <select class="bias-select" data-tf="D" data-asset="CUS"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">H4</div>
+            <select class="bias-select" data-tf="H4" data-asset="CUS"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="stated-section">
+        <div class="section-label">State D — Dynamique du prix</div>
+        <div class="stated-row">
+          <div class="stated-cell"><div class="stated-cell-label">Structure</div>
+            <select class="select-field" data-field="structure" data-asset="CUS"><option value="">—</option><option>BOS Haussier</option><option>BOS Baissier</option><option>CHoCH Haussier</option><option>CHoCH Baissier</option><option>Range / Consolidation</option><option>Distribution</option><option>Accumulation</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Phase de marché</div>
+            <select class="select-field" data-field="phase" data-asset="CUS"><option value="">—</option><option>Expansion</option><option>Retracement</option><option>Reversal</option><option>Consolidation</option><option>Range</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Zone de prix</div>
+            <select class="select-field" data-field="zone" data-asset="CUS"><option value="">—</option><option>Premium</option><option>Equilibrium (50%)</option><option>Discount</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Cible prioritaire</div>
+            <input type="text" class="input-field" data-field="target" data-asset="CUS" placeholder="Niveau cible"/>
+          </div>
+        </div>
+      </div>
+      <div class="levels-section">
+        <div class="levels-header">
+          <div class="section-label" style="margin:0">Niveaux clés actifs</div>
+          <button class="btn-add-level" data-asset="CUS">+ Ajouter</button>
+        </div>
+        <div class="levels-table" id="levels-CUS"></div>
+      </div>
+      <textarea class="asset-note" data-field="note" data-asset="CUS" placeholder="Notes libres…" rows="2"></textarea>
+    </div>
+  </div><!-- /CUS -->
+
+</div><!-- /asset-grid -->
+
+<!-- ================================================================
+     RÉSUMÉ GLOBAL + NOTE DE SESSION
+================================================================ -->
+
+<div class="summary-card" id="summary-card">
+  <div class="summary-header" id="summary-toggle">
+    <span class="summary-title">&#9776;&nbsp; Résumé global &amp; Note de session</span>
+    <span class="toggle-icon">&#9662;</span>
+  </div>
+  <div class="summary-body">
+    <div>
+      <div class="summary-note-label">Récapitulatif bias (auto)</div>
+      <table class="bias-summary-table" id="bias-summary-table">
+        <thead>
+          <tr>
+            <th>Actif</th>
+            <th>Monthly</th>
+            <th>Weekly</th>
+            <th>Daily</th>
+            <th>H4</th>
+            <th>Structure</th>
+            <th>Phase</th>
+            <th>Zone</th>
+          </tr>
+        </thead>
+        <tbody id="bias-summary-body"></tbody>
+      </table>
+    </div>
+    <div>
+      <div class="summary-note-label">Note de session</div>
+      <textarea class="summary-note" id="session-note" placeholder="Contexte macro du jour, corrélations, biais global, événements attendus, plan A / plan B…" rows="4"></textarea>
+    </div>
+  </div>
+</div>
+
+</div><!-- /page -->
+
+<div class="toast" id="toast">Sauvegardé ✓</div>
+
+<!-- ================================================================
+     JAVASCRIPT
+================================================================ -->
+
+<script>
+/* ================================================================
+   CONFIG — liste des actifs et leurs clés localStorage
+================================================================ */
+const ASSETS = ['XAU','BTC','SP5','WTI','DXY','CUS'];
+
+// Options des types de niveaux
+// PERSONNALISATION : modifier ce tableau pour ajouter/retirer des types
+const LEVEL_TYPES = [
+  { val:'RES',   label:'RES' },
+  { val:'SUP',   label:'SUP' },
+  { val:'OB',    label:'OB'  },
+  { val:'FVG',   label:'FVG' },
+  { val:'IFVG',  label:'IFVG'},
+  { val:'LIQ',   label:'LIQ' },
+  { val:'EQ',    label:'EQ'  },
+  { val:'PDH',   label:'PDH' },
+  { val:'PWH',   label:'PWH' },
+  { val:'OTHER', label:'...' },
+];
+
+// Options des TF pour les niveaux
+// PERSONNALISATION : modifier ce tableau pour changer les TF disponibles
+const LEVEL_TFS = ['M','W','D','H4','H1','M30','M15','M5'];
+
+const LS_KEY = 'klg_v1_data';
+
+/* ================================================================
+   HORLOGE
+================================================================ */
+function updateClock() {
+  const now = new Date();
+  document.getElementById('hdr-date').textContent =
+    now.toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  document.getElementById('hdr-time').textContent =
+    now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', second:'2-digit' }) + ' UTC' +
+    (now.getTimezoneOffset() < 0 ? '+' : '') + (-now.getTimezoneOffset()/60);
+  const week = getWeekNumber(now);
+  document.getElementById('hdr-week').textContent = 'Semaine ' + week + ' · ' + now.getFullYear();
+}
+
+function getWeekNumber(d) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  return Math.ceil((((date - yearStart) / 86400000) + 1)/7);
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+
+/* ================================================================
+   ÉTAT GLOBAL
+================================================================ */
+let state = {
+  customTicker: '',
+  sessionNote: '',
+  assets: {}
+};
+
+ASSETS.forEach(a => {
+  state.assets[a] = {
+    bias: { M:'', W:'', D:'', H4:'' },
+    structure: '', phase: '', zone: '', target: '', note: '',
+    levels: []   // [{ type, price, tf }]
+  };
+});
+
+/* ================================================================
+   NIVEAUX CLÉS — RENDER
+================================================================ */
+function buildLevelTypeOptions(selected) {
+  return LEVEL_TYPES.map(t =>
+    `<option value="${t.val}"${selected===t.val?' selected':''}>${t.label}</option>`
+  ).join('');
+}
+
+function buildLevelTfOptions(selected) {
+  return LEVEL_TFS.map(tf =>
+    `<option value="${tf}"${selected===tf?' selected':''}>${tf}</option>`
+  ).join('');
+}
+
+function renderLevels(asset) {
+  const container = document.getElementById('levels-' + asset);
+  const levels = state.assets[asset].levels;
+
+  if (!levels.length) {
+    container.innerHTML = '<div style="font-size:.7rem;color:var(--t4);font-family:var(--font-mono);padding:6px 2px;">Aucun niveau — cliquer « + Ajouter »</div>';
+    return;
+  }
+
+  container.innerHTML = levels.map((lv, i) => `
+    <div class="level-row" data-asset="${asset}" data-index="${i}">
+      <select class="level-type-select" data-asset="${asset}" data-index="${i}" data-role="type" data-type="${lv.type}">
+        ${buildLevelTypeOptions(lv.type)}
+      </select>
+      <input type="text" class="level-price-input" data-asset="${asset}" data-index="${i}" data-role="price"
+             value="${lv.price}" placeholder="Prix / Zone"/>
+      <select class="level-tf-select" data-asset="${asset}" data-index="${i}" data-role="tf">
+        ${buildLevelTfOptions(lv.tf)}
+      </select>
+      <button class="btn-del-level" data-asset="${asset}" data-index="${i}" title="Supprimer">&#10005;</button>
+    </div>
+  `).join('');
+
+  // Attacher les événements sur les nouvelles lignes
+  container.querySelectorAll('.level-type-select').forEach(sel => {
+    applyTypeColor(sel, sel.value);
+    sel.addEventListener('change', function() {
+      const a = this.dataset.asset, idx = +this.dataset.index;
+      state.assets[a].levels[idx].type = this.value;
+      applyTypeColor(this, this.value);
+    });
+  });
+
+  container.querySelectorAll('.level-price-input').forEach(inp => {
+    inp.addEventListener('input', function() {
+      const a = this.dataset.asset, idx = +this.dataset.index;
+      state.assets[a].levels[idx].price = this.value;
+    });
+  });
+
+  container.querySelectorAll('.level-tf-select').forEach(sel => {
+    sel.addEventListener('change', function() {
+      const a = this.dataset.asset, idx = +this.dataset.index;
+      state.assets[a].levels[idx].tf = this.value;
+    });
+  });
+
+  container.querySelectorAll('.btn-del-level').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const a = this.dataset.asset, idx = +this.dataset.index;
+      state.assets[a].levels.splice(idx, 1);
+      renderLevels(a);
+    });
+  });
+}
+
+function applyTypeColor(el, val) {
+  el.setAttribute('data-type', val || 'OTHER');
+}
+
+/* ================================================================
+   AJOUTER UN NIVEAU
+================================================================ */
+document.querySelectorAll('.btn-add-level').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const a = this.dataset.asset;
+    state.assets[a].levels.push({ type:'RES', price:'', tf:'D' });
+    renderLevels(a);
+  });
+});
+
+/* ================================================================
+   BIAS SELECTS — couleur dynamique
+================================================================ */
+function applyBiasColor(sel) {
+  sel.className = 'bias-select';
+  if (sel.value === 'bull') sel.classList.add('bull');
+  else if (sel.value === 'bear') sel.classList.add('bear');
+  else if (sel.value === 'neut') sel.classList.add('neut');
+}
+
+document.querySelectorAll('.bias-select').forEach(sel => {
+  applyBiasColor(sel);
+  sel.addEventListener('change', function() {
+    const a = this.dataset.asset, tf = this.dataset.tf;
+    state.assets[a].bias[tf] = this.value;
+    applyBiasColor(this);
+    renderSummaryTable();
+  });
+});
+
+/* ================================================================
+   CHAMPS STATE D
+================================================================ */
+document.querySelectorAll('.select-field[data-field]').forEach(el => {
+  el.addEventListener('change', function() {
+    const a = this.dataset.asset, f = this.dataset.field;
+    state.assets[a][f] = this.value;
+    renderSummaryTable();
+  });
+});
+
+document.querySelectorAll('.input-field[data-field]').forEach(el => {
+  el.addEventListener('input', function() {
+    const a = this.dataset.asset, f = this.dataset.field;
+    state.assets[a][f] = this.value;
+  });
+});
+
+/* ================================================================
+   NOTES PAR ACTIF
+================================================================ */
+document.querySelectorAll('.asset-note').forEach(el => {
+  el.addEventListener('input', function() {
+    state.assets[this.dataset.asset].note = this.value;
+  });
+});
+
+/* ================================================================
+   NOM CUSTOM
+================================================================ */
+document.getElementById('custom-ticker').addEventListener('input', function() {
+  state.customTicker = this.value;
+});
+
+/* ================================================================
+   NOTE DE SESSION
+================================================================ */
+document.getElementById('session-note').addEventListener('input', function() {
+  state.sessionNote = this.value;
+});
+
+/* ================================================================
+   RÉSUMÉ TABLE (auto-refresh)
+================================================================ */
+const ASSET_LABELS = { XAU:'XAU/USD', BTC:'BTC/USD', SP5:'SP500', WTI:'WTI', DXY:'DXY', CUS:'—' };
+
+function biasCell(val) {
+  if (!val) return '<span style="color:var(--t4)">—</span>';
+  if (val==='bull') return '<span style="color:var(--bull)">&#9650; Bull</span>';
+  if (val==='bear') return '<span style="color:var(--bear)">&#9660; Bear</span>';
+  return '<span style="color:var(--neut)">&#9632; Neut</span>';
+}
+
+function renderSummaryTable() {
+  const tbody = document.getElementById('bias-summary-body');
+  tbody.innerHTML = ASSETS.map(a => {
+    const d = state.assets[a];
+    const label = a === 'CUS' ? (state.customTicker || '—') : ASSET_LABELS[a];
+    return `<tr>
+      <td class="asset-col">${label}</td>
+      <td>${biasCell(d.bias.M)}</td>
+      <td>${biasCell(d.bias.W)}</td>
+      <td>${biasCell(d.bias.D)}</td>
+      <td>${biasCell(d.bias.H4)}</td>
+      <td style="color:var(--t1)">${d.structure||'<span style="color:var(--t4)">—</span>'}</td>
+      <td style="color:var(--t2)">${d.phase||'<span style="color:var(--t4)">—</span>'}</td>
+      <td style="color:var(--amber)">${d.zone||'<span style="color:var(--t4)">—</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ================================================================
+   TOGGLE RÉSUMÉ
+================================================================ */
+document.getElementById('summary-toggle').addEventListener('click', () => {
+  document.getElementById('summary-card').classList.toggle('open');
+  renderSummaryTable();
+});
+
+/* ================================================================
+   SAUVEGARDE
+================================================================ */
+function saveState() {
+  localStorage.setItem(LS_KEY, JSON.stringify(state));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+document.getElementById('btn-save').addEventListener('click', () => {
+  saveState();
+  showToast('Session sauvegardée ✓');
+});
+
+// Auto-save discret toutes les 30s
+setInterval(saveState, 30000);
+
+/* ================================================================
+   CHARGEMENT
+================================================================ */
+function loadState() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(LS_KEY)); } catch(e) {}
+  if (!saved) return;
+
+  if (saved.customTicker) {
+    state.customTicker = saved.customTicker;
+    document.getElementById('custom-ticker').value = saved.customTicker;
+  }
+
+  if (saved.sessionNote) {
+    state.sessionNote = saved.sessionNote;
+    document.getElementById('session-note').value = saved.sessionNote;
+  }
+
+  ASSETS.forEach(a => {
+    if (!saved.assets || !saved.assets[a]) return;
+    const src = saved.assets[a];
+    const dst = state.assets[a];
+
+    // Bias
+    if (src.bias) {
+      Object.keys(src.bias).forEach(tf => {
+        dst.bias[tf] = src.bias[tf] || '';
+        const sel = document.querySelector(`.bias-select[data-asset="${a}"][data-tf="${tf}"]`);
+        if (sel) { sel.value = dst.bias[tf]; applyBiasColor(sel); }
+      });
+    }
+
+    // Champs State D
+    ['structure','phase','zone','target','note'].forEach(f => {
+      if (src[f] !== undefined) {
+        dst[f] = src[f];
+        const el = document.querySelector(`[data-field="${f}"][data-asset="${a}"]`);
+        if (el) el.value = src[f];
+      }
+    });
+
+    // Niveaux
+    if (Array.isArray(src.levels)) {
+      dst.levels = src.levels;
+      renderLevels(a);
+    }
+  });
+
+  renderSummaryTable();
+}
+
+/* ================================================================
+   RESET — NOUVELLE SESSION
+================================================================ */
+document.getElementById('btn-reset').addEventListener('click', () => {
+  if (!confirm('Effacer toutes les données de la session en cours ?')) return;
+  localStorage.removeItem(LS_KEY);
+  location.reload();
+});
+
+/* ================================================================
+   EXPORT TEXTE
+================================================================ */
+document.getElementById('btn-export').addEventListener('click', () => {
+  const line  = '═'.repeat(52);
+  const line2 = '─'.repeat(52);
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+
+  let out = [
+    line,
+    'KEY LEVELS GRID — ' + dateStr,
+    'Exporté le ' + now.toLocaleString('fr-FR'),
+    line,
+    ''
+  ];
+
+  ASSETS.forEach(a => {
+    const d = state.assets[a];
+    const label = a === 'CUS' ? (state.customTicker || 'AUTRE') : ASSET_LABELS[a];
+    out.push('[ ' + label + ' ]');
+    out.push(line2);
+
+    out.push('BIAS HTF :');
+    out.push('  Monthly : ' + (d.bias.M  ? d.bias.M.toUpperCase()  : '—'));
+    out.push('  Weekly  : ' + (d.bias.W  ? d.bias.W.toUpperCase()  : '—'));
+    out.push('  Daily   : ' + (d.bias.D  ? d.bias.D.toUpperCase()  : '—'));
+    out.push('  H4      : ' + (d.bias.H4 ? d.bias.H4.toUpperCase() : '—'));
+
+    out.push('');
+    out.push('STATE D :');
+    out.push('  Structure    : ' + (d.structure || '—'));
+    out.push('  Phase        : ' + (d.phase     || '—'));
+    out.push('  Zone de prix : ' + (d.zone      || '—'));
+    out.push('  Cible        : ' + (d.target    || '—'));
+
+    if (d.levels && d.levels.length) {
+      out.push('');
+      out.push('NIVEAUX CLÉS :');
+      d.levels.forEach(lv => {
+        out.push('  [' + (lv.type||'?').padEnd(5) + '] ' + (lv.price||'—').padStart(10) + '   ' + (lv.tf||'—'));
+      });
+    }
+
+    if (d.note) {
+      out.push('');
+      out.push('NOTE : ' + d.note);
+    }
+
+    out.push('');
+  });
+
+  if (state.sessionNote) {
+    out.push(line);
+    out.push('NOTE DE SESSION :');
+    out.push(state.sessionNote);
+    out.push('');
+  }
+
+  out.push(line);
+
+  const text = out.join('\n');
+
+  // Copier dans le presse-papiers
+  const copy = (t) => {
+    const ta = document.createElement('textarea');
+    ta.value = t; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  };
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showToast('Export copié dans le presse-papiers ✓'))
+      .catch(() => { copy(text); showToast('Export copié ✓'); });
+  } else {
+    copy(text);
+    showToast('Export copié dans le presse-papiers ✓');
+  }
+});
+
+/* ================================================================
+   INIT
+================================================================ */
+ASSETS.forEach(a => renderLevels(a));
+loadState();
+</script>
+
+</body>
+</html>
