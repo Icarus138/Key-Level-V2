@@ -165,6 +165,7 @@ def update_html(market_data):
         f'<script id="auto-market-data">\n'
         f'/* Auto-généré par GitHub Actions — {date_str} {time_str} (Paris) */\n'
         f'const AUTO_MARKET_DATA = {data_json};\n'
+        f'applyMarketData();\n'
         f'</script>\n'
         f'<!-- MARKET_DATA:END -->'
     )
