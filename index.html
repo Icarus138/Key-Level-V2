@@ -1665,16 +1665,12 @@ loadState();
 
 /* ================================================================
    AUTO MARKET DATA — lecture du bloc injecté par GitHub Actions
+   Appelée à chaque load, sans blocage localStorage.
+   Niveaux auto identifiés par { auto:true }, jamais écrasés
+   par les niveaux manuels de l'utilisateur.
 ================================================================ */
 function applyMarketData() {
-  // AUTO_MARKET_DATA est injecté par le script Python via GitHub Actions
   if (typeof AUTO_MARKET_DATA === 'undefined') return;
-
-  const today    = AUTO_MARKET_DATA.generated_date;
-  const lastAuto = localStorage.getItem('klg_last_auto_date');
-
-  // N'appliquer que si c'est un nouveau jour (évite d'écraser les éditions manuelles)
-  if (lastAuto === today) return;
 
   const MAP = { XAU:'XAU', BTC:'BTC', SP5:'SP5', NAS:'NAS', WTI:'WTI', DXY:'DXY' };
 
@@ -1682,87 +1678,39 @@ function applyMarketData() {
     const d = AUTO_MARKET_DATA.assets[key];
     if (!d) return;
 
-    // Pré-remplir la cible avec le prix de clôture
+    // Pré-remplir la cible seulement si le champ est vide
     if (d.price) {
-      const targetEl = document.querySelector(`[data-field="target"][data-asset="${asset}"]`);
-      if (targetEl) { targetEl.value = d.price.toFixed(2); state.assets[asset].target = String(d.price.toFixed(2)); }
+      const targetEl = document.querySelector(
+        `[data-field="target"][data-asset="${asset}"]`
+      );
+      if (targetEl && !targetEl.value) {
+        const val = d.price.toFixed(asset === 'BTC' ? 0 : 2);
+        targetEl.value = val;
+        state.assets[asset].target = val;
+      }
     }
 
-    // Construire les niveaux auto (PDH, PDL, PWH, PWL)
+    // Niveaux auto frais (PDH, PDL, PWH, PWL)
     const autoLevels = [];
-    if (d.pdh) autoLevels.push({ type:'PDH', price: String(d.pdh.toFixed(2)), tf:'D', auto:true });
-    if (d.pdl) autoLevels.push({ type:'PDL', price: String(d.pdl.toFixed(2)), tf:'D', auto:true });
-    if (d.pwh) autoLevels.push({ type:'PWH', price: String(d.pwh.toFixed(2)), tf:'W', auto:true });
-    if (d.pwl) autoLevels.push({ type:'PWL', price: String(d.pwl.toFixed(2)), tf:'W', auto:true });
+    if (d.pdh) autoLevels.push({ type:'PDH', price: d.pdh.toFixed(2), tf:'D', auto:true });
+    if (d.pdl) autoLevels.push({ type:'PDL', price: d.pdl.toFixed(2), tf:'D', auto:true });
+    if (d.pwh) autoLevels.push({ type:'PWH', price: d.pwh.toFixed(2), tf:'W', auto:true });
+    if (d.pwl) autoLevels.push({ type:'PWL', price: d.pwl.toFixed(2), tf:'W', auto:true });
 
-    // Fusionner : garder les niveaux manuels existants + ajouter les auto
+    // Garder les niveaux manuels, remplacer les auto
     const manual = (state.assets[asset].levels || []).filter(l => !l.auto);
     state.assets[asset].levels = [...autoLevels, ...manual];
     renderLevels(asset);
   });
 
-  // Marquer cette date comme déjà appliquée
-  localStorage.setItem('klg_last_auto_date', today);
-  saveState();
-
-  // Notification visible
-  showToast('📊 Données auto chargées — ' + AUTO_MARKET_DATA.generated_date
-    + ' ' + AUTO_MARKET_DATA.generated_time);
+  showToast('📊 ' + AUTO_MARKET_DATA.generated_date
+    + ' · ' + AUTO_MARKET_DATA.generated_time + ' — niveaux chargés');
 }
 </script>
 
 <!-- MARKET_DATA:START -->
 <script id="auto-market-data">
-/* Auto-généré par GitHub Actions — 2026-04-01 16:55 (Paris) */
-const AUTO_MARKET_DATA = {
-  "generated_date": "2026-04-01",
-  "generated_time": "16:55",
-  "assets": {
-    "XAU": {
-      "price": 4782.6,
-      "pdh": 4684.1,
-      "pdl": 4508.6,
-      "pwh": 4551.9,
-      "pwl": 4100.8
-    },
-    "BTC": {
-      "price": 68506.0,
-      "pdh": 68495.0,
-      "pdl": 65950.0,
-      "pwh": 71986.0,
-      "pwl": 64972.0
-    },
-    "SP5": {
-      "price": 6589.67,
-      "pdh": 6539.05,
-      "pdl": 6395.88,
-      "pwh": 6651.62,
-      "pwl": 6356.08
-    },
-    "WTI": {
-      "price": 98.81,
-      "pdh": 106.86,
-      "pdl": 99.62,
-      "pwh": 101.67,
-      "pwl": 84.37
-    },
-    "DXY": {
-      "price": 99.384,
-      "pdh": 100.64,
-      "pdl": 99.81,
-      "pwh": 100.21,
-      "pwl": 98.88
-    },
-    "NAS": {
-      "price": 21883.24,
-      "pdh": 21642.62,
-      "pdl": 21063.38,
-      "pwh": 22189.34,
-      "pwl": 20909.93
-    }
-  }
-};
-applyMarketData();
+/* Ce bloc est remplacé automatiquement chaque matin par GitHub Actions. */
 </script>
 <!-- MARKET_DATA:END -->
 </body>
