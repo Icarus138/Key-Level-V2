@@ -1,213 +1,259 @@
 #!/usr/bin/env python3
 """
-update_levels.py — Daily Market Data Updater
-=============================================
-Récupère les prix de clôture + PDH/PDL/PWH/PWL
-via yfinance et injecte les données dans index.html.
-
-Lancé automatiquement chaque matin par GitHub Actions.
-Peut aussi être lancé manuellement : python update_levels.py
+update_levels.py — Daily Market Data Updater v2
+================================================
+Récupère et calcule les niveaux mécaniques ICT/SMC :
+  - Previous Day/Week/Month High/Low (PDH/PDL/PWH/PWL/PMH/PML)
+  - Daily/Weekly/Monthly Open (DO/WO/MO)
+  - Session High/Low Asia / London / New York
+  - Prix actuel (dernière clôture disponible)
 """
 
 import yfinance as yf
-import json
-import re
-import os
-from datetime import datetime
+import json, re, os
+from datetime import datetime, timedelta
 import pytz
 
-
 # ================================================================
-# CONFIGURATION — modifier les tickers si besoin
+# CONFIGURATION ACTIFS
 # ================================================================
 ASSETS = {
-    'XAU': {
-        'ticker': 'GC=F',        # Gold Futures (proche du spot XAU/USD)
-        'label':  'XAU/USD',
-        'digits':  2             # décimales pour l'arrondi
-    },
-    'BTC': {
-        'ticker': 'BTC-USD',     # Bitcoin / USD
-        'label':  'BTC/USD',
-        'digits':  0
-    },
-    'SP5': {
-        'ticker': '^GSPC',       # S&P 500
-        'label':  'SP500',
-        'digits':  2
-    },
-    'WTI': {
-        'ticker': 'CL=F',        # WTI Crude Oil Futures
-        'label':  'WTI',
-        'digits':  2
-    },
-    'DXY': {
-        'ticker': 'DX-Y.NYB',    # Dollar Index
-        'label':  'DXY',
-        'digits':  3
-    },
-    'NAS': {
-        'ticker': '^IXIC',       # NASDAQ Composite
-        'label':  'NASDAQ',
-        'digits':  2
-    },
+    'XAU': { 'ticker': 'GC=F',      'label': 'XAU/USD',  'digits': 2  },
+    'BTC': { 'ticker': 'BTC-USD',   'label': 'BTC/USD',  'digits': 0  },
+    'SP5': { 'ticker': '^GSPC',     'label': 'SP500',    'digits': 2  },
+    'NAS': { 'ticker': '^IXIC',     'label': 'NASDAQ',   'digits': 2  },
+    'WTI': { 'ticker': 'CL=F',      'label': 'WTI',      'digits': 2  },
+    'DXY': { 'ticker': 'DX-Y.NYB',  'label': 'DXY',      'digits': 3  },
 }
 
-# Fuseau horaire Paris pour l'horodatage
 PARIS_TZ = pytz.timezone('Europe/Paris')
+UTC_TZ   = pytz.utc
+
+# Sessions en heures UTC (start, end)
+SESSIONS = {
+    'asia':   (22, 8),   # 22h UTC J-1 -> 08h UTC (chevauche minuit)
+    'london': (7,  16),
+    'ny':     (13, 21),
+}
 
 
 # ================================================================
-# FETCH DATA
+# UTILITAIRES
 # ================================================================
-def fetch_asset(key, config):
-    """
-    Récupère pour un actif :
-    - price  : dernier prix de clôture disponible
-    - pdh    : Previous Day High (J-1)
-    - pdl    : Previous Day Low  (J-1)
-    - pwh    : Previous Week High
-    - pwl    : Previous Week Low
-    """
-    ticker  = config['ticker']
-    digits  = config['digits']
+def r(v, d): return round(float(v), d)
 
+def in_session(dt_utc, sess):
+    h = dt_utc.hour
+    start, end = SESSIONS[sess]
+    if start < end:
+        return start <= h < end
+    return h >= start or h < end  # chevauche minuit
+
+def get_week_start(today):
+    return today - timedelta(days=today.weekday())
+
+def get_month_start(today):
+    return today.replace(day=1)
+
+def to_date(idx):
+    d = idx
+    if hasattr(d, 'to_pydatetime'):
+        d = d.to_pydatetime()
+    if hasattr(d, 'date'):
+        d = d.date()
+    return d
+
+
+# ================================================================
+# FETCH JOURNALIER — previous levels + opens
+# ================================================================
+def fetch_daily(ticker, digits):
+    t = yf.Ticker(ticker)
+    hist_d = t.history(period='3mo',  interval='1d')
+    hist_w = t.history(period='6mo',  interval='1wk')
+    hist_m = t.history(period='12mo', interval='1mo')
+
+    if hist_d.empty:
+        return None
+
+    now_utc     = datetime.now(UTC_TZ)
+    week_start  = get_week_start(now_utc.date())
+    month_start = get_month_start(now_utc.date())
+
+    # Prix actuel
+    price = r(hist_d['Close'].iloc[-1], digits)
+
+    # PDH / PDL (avant-dernier jour)
+    i = -2 if len(hist_d) >= 2 else -1
+    pdh = r(hist_d['High'].iloc[i], digits)
+    pdl = r(hist_d['Low'].iloc[i],  digits)
+
+    # PWH / PWL (avant-dernière semaine)
+    pwh = pwl = None
+    if not hist_w.empty and len(hist_w) >= 2:
+        pwh = r(hist_w['High'].iloc[-2], digits)
+        pwl = r(hist_w['Low'].iloc[-2],  digits)
+
+    # PMH / PML (avant-dernier mois)
+    pmh = pml = None
+    if not hist_m.empty and len(hist_m) >= 2:
+        pmh = r(hist_m['High'].iloc[-2], digits)
+        pml = r(hist_m['Low'].iloc[-2],  digits)
+
+    # DO — open du dernier jour disponible
+    do = r(hist_d['Open'].iloc[-1], digits)
+
+    # WO — open du premier trading day de la semaine courante
+    wo = None
+    for i in range(len(hist_d) - 1, -1, -1):
+        d = to_date(hist_d.index[i])
+        if d >= week_start:
+            wo = r(hist_d['Open'].iloc[i], digits)
+        else:
+            break
+
+    # MO — open du premier trading day du mois courant
+    mo = None
+    for i in range(len(hist_d) - 1, -1, -1):
+        d = to_date(hist_d.index[i])
+        if d >= month_start:
+            mo = r(hist_d['Open'].iloc[i], digits)
+        else:
+            break
+
+    return {
+        'price': price,
+        'pdh': pdh, 'pdl': pdl,
+        'pwh': pwh, 'pwl': pwl,
+        'pmh': pmh, 'pml': pml,
+        'do':  do,  'wo':  wo,  'mo': mo,
+    }
+
+
+# ================================================================
+# FETCH SESSIONS — données horaires
+# ================================================================
+def fetch_sessions(ticker, digits):
+    empty = {k: None for k in ['asia_h','asia_l','london_h','london_l','ny_h','ny_l']}
     try:
         t = yf.Ticker(ticker)
+        hist_1h = t.history(period='2d', interval='1h')
+        if hist_1h.empty:
+            return empty
 
-        # Données journalières — 15 derniers jours pour avoir J-1 fiable
-        hist_d = t.history(period='15d', interval='1d')
+        buckets = {s: {'h': [], 'l': []} for s in SESSIONS}
 
-        # Données hebdomadaires — 10 semaines pour avoir W-1 fiable
-        hist_w = t.history(period='70d', interval='1wk')
+        for idx, row in hist_1h.iterrows():
+            if hasattr(idx, 'to_pydatetime'):
+                dt = idx.to_pydatetime()
+            else:
+                dt = idx
+            if dt.tzinfo is None:
+                dt = UTC_TZ.localize(dt)
+            else:
+                dt = dt.astimezone(UTC_TZ)
 
-        if hist_d.empty:
-            print(f'  [{key}] ERREUR : aucune donnée journalière.')
-            return None
+            for sess in SESSIONS:
+                if in_session(dt, sess):
+                    buckets[sess]['h'].append(float(row['High']))
+                    buckets[sess]['l'].append(float(row['Low']))
 
-        # Prix = clôture la plus récente
-        price = round(float(hist_d['Close'].iloc[-1]), digits)
+        result = {}
+        for sess, data in buckets.items():
+            result[f'{sess}_h'] = r(max(data['h']), digits) if data['h'] else None
+            result[f'{sess}_l'] = r(min(data['l']), digits) if data['l'] else None
 
-        # PDH/PDL = jour J-1 (avant-dernier point)
-        if len(hist_d) >= 2:
-            pdh = round(float(hist_d['High'].iloc[-2]), digits)
-            pdl = round(float(hist_d['Low'].iloc[-2]),  digits)
-        else:
-            # Pas assez de données — fallback sur le seul point disponible
-            pdh = round(float(hist_d['High'].iloc[-1]), digits)
-            pdl = round(float(hist_d['Low'].iloc[-1]),  digits)
-
-        # PWH/PWL = semaine W-1 (avant-dernière bougie hebdo)
-        if len(hist_w) >= 2:
-            pwh = round(float(hist_w['High'].iloc[-2]), digits)
-            pwl = round(float(hist_w['Low'].iloc[-2]),  digits)
-        else:
-            pwh = round(float(hist_w['High'].iloc[-1]), digits) if not hist_w.empty else price
-            pwl = round(float(hist_w['Low'].iloc[-1]),  digits) if not hist_w.empty else price
-
-        result = {
-            'price': price,
-            'pdh':   pdh,
-            'pdl':   pdl,
-            'pwh':   pwh,
-            'pwl':   pwl,
-        }
-
-        print(f'  [{key}] Prix: {price} | PDH: {pdh} | PDL: {pdl} | PWH: {pwh} | PWL: {pwl}')
         return result
+    except Exception as e:
+        print(f'    Sessions error: {e}')
+        return empty
 
+
+# ================================================================
+# FETCH COMPLET PAR ACTIF
+# ================================================================
+def fetch_asset(key, config):
+    ticker = config['ticker']
+    digits = config['digits']
+    try:
+        daily    = fetch_daily(ticker, digits)
+        if not daily:
+            print(f'  [{key}] ERREUR : pas de données journalières.')
+            return None
+        sessions = fetch_sessions(ticker, digits)
+        data = {**daily, **sessions}
+        print(f'  [{key}] OK — price={data["price"]} | '
+              f'PDH={data["pdh"]}/{data["pdl"]} | '
+              f'PWH={data["pwh"]}/{data["pwl"]} | '
+              f'PMH={data["pmh"]}/{data["pml"]} | '
+              f'DO={data["do"]} WO={data["wo"]} MO={data["mo"]}')
+        return data
     except Exception as e:
         print(f'  [{key}] ERREUR : {e}')
         return None
 
 
 # ================================================================
-# BUILD MARKET DATA OBJECT
+# BUILD + INJECT
 # ================================================================
 def build_market_data():
     now_paris = datetime.now(PARIS_TZ)
-    market_data = {
+    md = {
         'generated_date': now_paris.strftime('%Y-%m-%d'),
         'generated_time': now_paris.strftime('%H:%M'),
         'assets': {}
     }
-
     for key, config in ASSETS.items():
-        print(f'Fetching {config["label"]} ({config["ticker"]})...')
+        print(f'\nFetching {config["label"]}...')
         data = fetch_asset(key, config)
         if data:
-            market_data['assets'][key] = data
+            md['assets'][key] = data
+    return md
 
-    return market_data
 
-
-# ================================================================
-# UPDATE HTML
-# ================================================================
-def update_html(market_data):
-    # Chemin du fichier HTML (même dossier que ce script)
+def update_html(md):
     html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'index.html')
-
     if not os.path.exists(html_path):
         raise FileNotFoundError(f'index.html introuvable : {html_path}')
 
     with open(html_path, 'r', encoding='utf-8') as f:
         html = f.read()
 
-    # Sérialiser les données en JSON lisible
-    data_json = json.dumps(market_data, indent=2, ensure_ascii=False)
-
-    # Bloc de remplacement
-    date_str = market_data['generated_date']
-    time_str = market_data['generated_time']
-    replacement = (
+    data_json = json.dumps(md, indent=2, ensure_ascii=False)
+    repl = (
         f'<!-- MARKET_DATA:START -->\n'
         f'<script id="auto-market-data">\n'
-        f'/* Auto-généré par GitHub Actions — {date_str} {time_str} (Paris) */\n'
+        f'/* Auto-généré — {md["generated_date"]} {md["generated_time"]} (Paris) */\n'
         f'const AUTO_MARKET_DATA = {data_json};\n'
         f'applyMarketData();\n'
         f'</script>\n'
         f'<!-- MARKET_DATA:END -->'
     )
-
-    # Remplacer le bloc entre les marqueurs
-    pattern = r'<!-- MARKET_DATA:START -->.*?<!-- MARKET_DATA:END -->'
-    new_html, count = re.subn(pattern, replacement, html, flags=re.DOTALL)
-
-    if count == 0:
-        raise ValueError(
-            'Marqueurs MARKET_DATA:START / MARKET_DATA:END introuvables dans index.html.\n'
-            'Vérifie que le fichier HTML contient bien ces commentaires.'
-        )
+    new_html, n = re.subn(
+        r'<!-- MARKET_DATA:START -->.*?<!-- MARKET_DATA:END -->', repl, html, flags=re.DOTALL
+    )
+    if n == 0:
+        raise ValueError('Marqueurs MARKET_DATA introuvables dans index.html.')
 
     with open(html_path, 'w', encoding='utf-8') as f:
         f.write(new_html)
+    print(f'\nindex.html mis à jour.')
 
-    print(f'\nindex.html mis à jour avec succès ({count} bloc remplacé).')
 
-
-# ================================================================
-# MAIN
-# ================================================================
 def main():
-    print('=' * 52)
-    print('KEY LEVELS GRID — Daily Market Data Update')
-    now_paris = datetime.now(PARIS_TZ)
-    print(f'Heure Paris : {now_paris.strftime("%Y-%m-%d %H:%M")}')
-    print('=' * 52)
+    print('=' * 56)
+    print('KEY LEVELS GRID — Daily Market Data Update v2')
+    print(f'Paris : {datetime.now(PARIS_TZ).strftime("%Y-%m-%d %H:%M")}')
+    print('=' * 56)
 
-    market_data = build_market_data()
-
-    n_assets = len(market_data['assets'])
-    print(f'\n{n_assets}/{len(ASSETS)} actifs récupérés.')
-
-    if n_assets == 0:
-        print('ERREUR : aucun actif récupéré. index.html non modifié.')
+    md = build_market_data()
+    n  = len(md['assets'])
+    print(f'\n{n}/{len(ASSETS)} actifs récupérés.')
+    if n == 0:
+        print('Aucun actif — index.html non modifié.')
         return
-
-    update_html(market_data)
-    print(f'\nTerminé — données du {market_data["generated_date"]} à {market_data["generated_time"]}.')
-
+    update_html(md)
+    print(f'Terminé — {md["generated_date"]} {md["generated_time"]}.')
 
 if __name__ == '__main__':
     main()
