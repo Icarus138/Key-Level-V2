@@ -573,6 +573,200 @@ body {
 .asset-note:focus { border-color: var(--border-light); color: var(--t1); }
 
 /* ================================================================
+   PANNEAU NIVEAUX MÉCANIQUES — AUTO
+================================================================ */
+.mech-panel {
+  background: var(--bg-2);
+  border: 1px solid var(--border-mid);
+  border-left: 3px solid var(--amber);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 2px;
+}
+
+.mech-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 11px 6px;
+  background: rgba(245,158,11,.05);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+
+.mech-header-title {
+  font-family: var(--font-mono);
+  font-size: .58rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+.mech-header-meta {
+  font-family: var(--font-mono);
+  font-size: .58rem;
+  color: var(--t3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mech-price-badge {
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--t1);
+  background: var(--bg-4);
+  border: 1px solid var(--border-mid);
+  border-radius: 5px;
+  padding: 2px 8px;
+}
+
+.mech-toggle-icon {
+  font-size: .7rem;
+  color: var(--t3);
+  transition: transform var(--t);
+}
+
+.mech-panel.open .mech-toggle-icon { transform: rotate(180deg); }
+
+.mech-body {
+  display: none;
+  padding: 10px 11px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mech-panel.open .mech-body { display: flex; }
+
+/* Groupes de niveaux */
+.mech-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mech-group-label {
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 2px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Ligne de niveau */
+.mech-row {
+  display: grid;
+  grid-template-columns: 46px 90px 1fr 80px;
+  gap: 6px;
+  align-items: center;
+  padding: 3px 0;
+}
+
+.mech-type {
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  font-weight: 700;
+  color: var(--t3);
+  letter-spacing: .05em;
+}
+
+.mech-val {
+  font-family: var(--font-mono);
+  font-size: .74rem;
+  font-weight: 700;
+  color: var(--t1);
+  text-align: right;
+}
+
+.mech-dist {
+  font-family: var(--font-mono);
+  font-size: .64rem;
+  color: var(--t3);
+  text-align: right;
+}
+
+.mech-dist.above { color: var(--bull); }
+.mech-dist.below { color: var(--bear); }
+
+.mech-bar-wrap {
+  height: 3px;
+  background: var(--bg-4);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.mech-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  max-width: 100%;
+}
+
+/* Couleurs par type de niveau */
+.mech-type.pdh  { color: var(--lvl-pdh); }
+.mech-type.pdl  { color: var(--lvl-sup); }
+.mech-type.pwh  { color: var(--lvl-pdh); opacity:.75; }
+.mech-type.pwl  { color: var(--lvl-sup); opacity:.75; }
+.mech-type.pmh  { color: var(--lvl-pdh); opacity:.55; }
+.mech-type.pml  { color: var(--lvl-sup); opacity:.55; }
+.mech-type.do-t { color: var(--blue); }
+.mech-type.wo-t { color: var(--blue); opacity:.75; }
+.mech-type.mo-t { color: var(--blue); opacity:.55; }
+.mech-type.ash  { color: var(--violet); }
+.mech-type.asl  { color: var(--violet); opacity:.8; }
+.mech-type.loh  { color: var(--amber); }
+.mech-type.lol  { color: var(--amber); opacity:.8; }
+.mech-type.nyh  { color: var(--bull); }
+.mech-type.nyl  { color: var(--bull); opacity:.8; }
+
+/* Contexte de prix */
+.mech-context {
+  padding: 7px 0 2px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.mech-ctx-tag {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+
+.mech-ctx-tag.bull {
+  color: var(--bull);
+  background: var(--bull-d);
+  border-color: rgba(34,197,94,.25);
+}
+
+.mech-ctx-tag.bear {
+  color: var(--bear);
+  background: var(--bear-d);
+  border-color: rgba(239,68,68,.25);
+}
+
+.mech-ctx-tag.neut {
+  color: var(--t2);
+  background: var(--bg-3);
+  border-color: var(--border);
+}
+
+.mech-empty {
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  color: var(--t4);
+  padding: 6px 0;
+  text-align: center;
+}
+
+/* ================================================================
    SECTION RÉSUMÉ GLOBAL / CORRELATIONS
 ================================================================ */
 .summary-card {
@@ -838,14 +1032,21 @@ body {
         </div>
       </div>
 
-      <!-- Niveaux clés -->
-      <div class="levels-section">
-        <div class="levels-header">
-          <div class="section-label" style="margin:0">Niveaux clés actifs</div>
-          <button class="btn-add-level" data-asset="XAU">+ Ajouter</button>
+      <!-- Niveaux mécaniques auto -->
+      <div class="mech-panel" id="mech-XAU">
+        <div class="mech-header" onclick="this.closest('.mech-panel').classList.toggle('open')">
+          <span class="mech-header-title">&#9650; Niveaux mécaniques</span>
+          <div class="mech-header-meta">
+            <span class="mech-price-badge" id="mech-price-XAU">—</span>
+            <span class="mech-toggle-icon">&#9662;</span>
+          </div>
         </div>
-        <div class="levels-table" id="levels-XAU"></div>
+        <div class="mech-body" id="mech-body-XAU">
+          <div class="mech-empty">Aucune donnée — lancer le workflow GitHub Actions.</div>
+        </div>
       </div>
+
+      <!-- Niveaux clés -->
 
       <!-- Note -->
       <textarea class="asset-note" data-field="note" data-asset="XAU" placeholder="Notes libres : contexte, invalidation, observations…" rows="2"></textarea>
@@ -917,6 +1118,21 @@ body {
           </div>
         </div>
       </div>
+      <!-- Niveaux mécaniques auto -->
+      <div class="mech-panel" id="mech-BTC">
+        <div class="mech-header" onclick="this.closest('.mech-panel').classList.toggle('open')">
+          <span class="mech-header-title">&#9650; Niveaux mécaniques</span>
+          <div class="mech-header-meta">
+            <span class="mech-price-badge" id="mech-price-BTC">—</span>
+            <span class="mech-toggle-icon">&#9662;</span>
+          </div>
+        </div>
+        <div class="mech-body" id="mech-body-BTC">
+          <div class="mech-empty">Aucune donnée — lancer le workflow GitHub Actions.</div>
+        </div>
+      </div>
+
+      <!-- Niveaux clés -->
       <div class="levels-section">
         <div class="levels-header">
           <div class="section-label" style="margin:0">Niveaux clés actifs</div>
@@ -970,6 +1186,21 @@ body {
           </div>
         </div>
       </div>
+      <!-- Niveaux mécaniques auto -->
+      <div class="mech-panel" id="mech-SP5">
+        <div class="mech-header" onclick="this.closest('.mech-panel').classList.toggle('open')">
+          <span class="mech-header-title">&#9650; Niveaux mécaniques</span>
+          <div class="mech-header-meta">
+            <span class="mech-price-badge" id="mech-price-SP5">—</span>
+            <span class="mech-toggle-icon">&#9662;</span>
+          </div>
+        </div>
+        <div class="mech-body" id="mech-body-SP5">
+          <div class="mech-empty">Aucune donnée — lancer le workflow GitHub Actions.</div>
+        </div>
+      </div>
+
+      <!-- Niveaux clés -->
       <div class="levels-section">
         <div class="levels-header">
           <div class="section-label" style="margin:0">Niveaux clés actifs</div>
@@ -1023,6 +1254,21 @@ body {
           </div>
         </div>
       </div>
+      <!-- Niveaux mécaniques auto -->
+      <div class="mech-panel" id="mech-NAS">
+        <div class="mech-header" onclick="this.closest('.mech-panel').classList.toggle('open')">
+          <span class="mech-header-title">&#9650; Niveaux mécaniques</span>
+          <div class="mech-header-meta">
+            <span class="mech-price-badge" id="mech-price-NAS">—</span>
+            <span class="mech-toggle-icon">&#9662;</span>
+          </div>
+        </div>
+        <div class="mech-body" id="mech-body-NAS">
+          <div class="mech-empty">Aucune donnée — lancer le workflow GitHub Actions.</div>
+        </div>
+      </div>
+
+      <!-- Niveaux clés -->
       <div class="levels-section">
         <div class="levels-header">
           <div class="section-label" style="margin:0">Niveaux clés actifs</div>
@@ -1076,6 +1322,21 @@ body {
           </div>
         </div>
       </div>
+      <!-- Niveaux mécaniques auto -->
+      <div class="mech-panel" id="mech-WTI">
+        <div class="mech-header" onclick="this.closest('.mech-panel').classList.toggle('open')">
+          <span class="mech-header-title">&#9650; Niveaux mécaniques</span>
+          <div class="mech-header-meta">
+            <span class="mech-price-badge" id="mech-price-WTI">—</span>
+            <span class="mech-toggle-icon">&#9662;</span>
+          </div>
+        </div>
+        <div class="mech-body" id="mech-body-WTI">
+          <div class="mech-empty">Aucune donnée — lancer le workflow GitHub Actions.</div>
+        </div>
+      </div>
+
+      <!-- Niveaux clés -->
       <div class="levels-section">
         <div class="levels-header">
           <div class="section-label" style="margin:0">Niveaux clés actifs</div>
@@ -1129,6 +1390,21 @@ body {
           </div>
         </div>
       </div>
+      <!-- Niveaux mécaniques auto -->
+      <div class="mech-panel" id="mech-DXY">
+        <div class="mech-header" onclick="this.closest('.mech-panel').classList.toggle('open')">
+          <span class="mech-header-title">&#9650; Niveaux mécaniques</span>
+          <div class="mech-header-meta">
+            <span class="mech-price-badge" id="mech-price-DXY">—</span>
+            <span class="mech-toggle-icon">&#9662;</span>
+          </div>
+        </div>
+        <div class="mech-body" id="mech-body-DXY">
+          <div class="mech-empty">Aucune donnée — lancer le workflow GitHub Actions.</div>
+        </div>
+      </div>
+
+      <!-- Niveaux clés -->
       <div class="levels-section">
         <div class="levels-header">
           <div class="section-label" style="margin:0">Niveaux clés actifs</div>
@@ -1182,6 +1458,21 @@ body {
           </div>
         </div>
       </div>
+      <!-- Niveaux mécaniques auto -->
+      <div class="mech-panel" id="mech-CUS">
+        <div class="mech-header" onclick="this.closest('.mech-panel').classList.toggle('open')">
+          <span class="mech-header-title">&#9650; Niveaux mécaniques</span>
+          <div class="mech-header-meta">
+            <span class="mech-price-badge" id="mech-price-CUS">—</span>
+            <span class="mech-toggle-icon">&#9662;</span>
+          </div>
+        </div>
+        <div class="mech-body" id="mech-body-CUS">
+          <div class="mech-empty">Aucune donnée — lancer le workflow GitHub Actions.</div>
+        </div>
+      </div>
+
+      <!-- Niveaux clés -->
       <div class="levels-section">
         <div class="levels-header">
           <div class="section-label" style="margin:0">Niveaux clés actifs</div>
@@ -1664,11 +1955,183 @@ loadState();
    après que AUTO_MARKET_DATA soit défini. */
 
 /* ================================================================
-   AUTO MARKET DATA — lecture du bloc injecté par GitHub Actions
-   Appelée à chaque load, sans blocage localStorage.
-   Niveaux auto identifiés par { auto:true }, jamais écrasés
-   par les niveaux manuels de l'utilisateur.
+   AUTO MARKET DATA — Moteur de rendu des niveaux mécaniques ICT
+   Appelée à chaque chargement dès qu'AUTO_MARKET_DATA est défini.
+   Architecture modulaire :
+     1. calcUtils    — calculs distance / contexte
+     2. renderMech   — rendu HTML du panneau par actif
+     3. applyMarketData — point d'entrée
 ================================================================ */
+
+/* ── 1. UTILITAIRES DE CALCUL ─────────────────────────────── */
+const calcUtils = {
+
+  /** Distance signée entre prix et niveau, en valeur absolue + sens */
+  dist(price, level) {
+    if (level == null || !price) return null;
+    return +(level - price).toFixed(4);
+  },
+
+  /** Formatage distance pour affichage */
+  fmtDist(price, level, digits) {
+    const d = this.dist(price, level);
+    if (d === null) return '—';
+    const sign = d > 0 ? '+' : '';
+    return sign + d.toFixed(digits);
+  },
+
+  /** Largeur de barre proportionnelle (0-100%) par rapport au range PDH-PDL */
+  barWidth(price, level, pdh, pdl) {
+    if (level == null || pdh == null || pdl == null) return 0;
+    const range = pdh - pdl;
+    if (range === 0) return 50;
+    return Math.max(0, Math.min(100, ((level - pdl) / range) * 100));
+  },
+
+  /** Couleur de la barre selon position du niveau par rapport au prix */
+  barColor(price, level) {
+    if (level == null || price == null) return 'var(--t4)';
+    return level > price ? 'rgba(244,114,182,.5)' : 'rgba(74,222,128,.5)';
+  },
+
+  /** Contexte de prix ICT descriptif (jamais prescriptif) */
+  priceContext(d) {
+    const tags = [];
+    const { price, pdh, pdl, pwh, pwl, do: doVal, wo, mo, asia_h, london_h } = d;
+    if (!price) return tags;
+
+    if (pdh != null && pdl != null) {
+      if (price > pdh) tags.push({ label: 'Above PDH', cls: 'bull' });
+      else if (price < pdl) tags.push({ label: 'Below PDL', cls: 'bear' });
+      else tags.push({ label: 'Inside PDR', cls: 'neut' });
+    }
+    if (doVal != null) {
+      tags.push({ label: price >= doVal ? 'Above DO' : 'Below DO', cls: price >= doVal ? 'bull' : 'bear' });
+    }
+    if (wo != null) {
+      tags.push({ label: price >= wo ? 'Above WO' : 'Below WO', cls: price >= wo ? 'bull' : 'bear' });
+    }
+    if (mo != null) {
+      tags.push({ label: price >= mo ? 'Above MO' : 'Below MO', cls: price >= mo ? 'bull' : 'bear' });
+    }
+    if (pwh != null && pwl != null) {
+      if (price > pwh) tags.push({ label: 'Above PWH', cls: 'bull' });
+      else if (price < pwl) tags.push({ label: 'Below PWL', cls: 'bear' });
+    }
+    if (asia_h != null && london_h != null) {
+      if (price > asia_h) tags.push({ label: 'Above Asia H', cls: 'bull' });
+    }
+    return tags;
+  }
+};
+
+/* ── 2. RENDU HTML DU PANNEAU PAR ACTIF ──────────────────── */
+function renderMechPanel(asset, d) {
+  const dig  = asset === 'BTC' ? 0 : asset === 'DXY' ? 3 : 2;
+  const fv   = v => v != null ? (+v).toFixed(dig) : '—';
+  const fd   = (p, l) => calcUtils.fmtDist(p, l, dig);
+  const dcls = (p, l) => l != null && p != null ? (l > p ? 'above' : 'below') : '';
+  const bc   = (p, l) => calcUtils.barColor(p, l);
+  const bw   = (p, l) => calcUtils.barWidth(p, l, d.pdh, d.pdl);
+
+  // Mettre à jour le badge prix dans le header
+  const priceEl = document.getElementById('mech-price-' + asset);
+  if (priceEl) priceEl.textContent = fv(d.price);
+
+  // ── Groupe : Previous Highs / Lows
+  const prevRows = [
+    ['PDH', 'pdh', 'pdh'],
+    ['PDL', 'pdl', 'pdl'],
+    ['PWH', 'pwh', 'pwh'],
+    ['PWL', 'pwl', 'pwl'],
+    ['PMH', 'pmh', 'pmh'],
+    ['PML', 'pml', 'pml'],
+  ];
+
+  const prevHtml = prevRows.map(([label, key, cls]) => {
+    const val = d[key];
+    if (val == null) return '';
+    const w = bw(d.price, val);
+    return `<div class="mech-row">
+      <span class="mech-type ${cls}">${label}</span>
+      <span class="mech-val">${fv(val)}</span>
+      <div class="mech-bar-wrap"><div class="mech-bar-fill" style="width:${w}%;background:${bc(d.price,val)}"></div></div>
+      <span class="mech-dist ${dcls(d.price,val)}">${fd(d.price,val)}</span>
+    </div>`;
+  }).join('');
+
+  // ── Groupe : Opens
+  const opensRows = [
+    ['DO',  'do',  'do-t'],
+    ['WO',  'wo',  'wo-t'],
+    ['MO',  'mo',  'mo-t'],
+  ];
+
+  const opensHtml = opensRows.map(([label, key, cls]) => {
+    const val = d[key];
+    if (val == null) return '';
+    const w = bw(d.price, val);
+    return `<div class="mech-row">
+      <span class="mech-type ${cls}">${label}</span>
+      <span class="mech-val">${fv(val)}</span>
+      <div class="mech-bar-wrap"><div class="mech-bar-fill" style="width:${w}%;background:${bc(d.price,val)}"></div></div>
+      <span class="mech-dist ${dcls(d.price,val)}">${fd(d.price,val)}</span>
+    </div>`;
+  }).join('');
+
+  // ── Groupe : Sessions
+  const sessRows = [
+    ['Asia H',  'asia_h',   'ash'],
+    ['Asia L',  'asia_l',   'asl'],
+    ['London H','london_h', 'loh'],
+    ['London L','london_l', 'lol'],
+    ['NY H',    'ny_h',     'nyh'],
+    ['NY L',    'ny_l',     'nyl'],
+  ];
+
+  const sessHtml = sessRows.map(([label, key, cls]) => {
+    const val = d[key];
+    if (val == null) return '';
+    const w = bw(d.price, val);
+    return `<div class="mech-row">
+      <span class="mech-type ${cls}">${label}</span>
+      <span class="mech-val">${fv(val)}</span>
+      <div class="mech-bar-wrap"><div class="mech-bar-fill" style="width:${w}%;background:${bc(d.price,val)}"></div></div>
+      <span class="mech-dist ${dcls(d.price,val)}">${fd(d.price,val)}</span>
+    </div>`;
+  }).join('');
+
+  // ── Contexte de prix
+  const ctxTags = calcUtils.priceContext(d);
+  const ctxHtml = ctxTags.length
+    ? `<div class="mech-context">${ctxTags.map(t=>`<span class="mech-ctx-tag ${t.cls}">${t.label}</span>`).join('')}</div>`
+    : '';
+
+  // ── Assemblage
+  const body = document.getElementById('mech-body-' + asset);
+  if (!body) return;
+
+  body.innerHTML = `
+    ${prevHtml ? `<div class="mech-group">
+      <div class="mech-group-label">Previous High / Low</div>
+      ${prevHtml}
+    </div>` : ''}
+    ${opensHtml ? `<div class="mech-group">
+      <div class="mech-group-label">Opens</div>
+      ${opensHtml}
+    </div>` : ''}
+    ${sessHtml ? `<div class="mech-group">
+      <div class="mech-group-label">Sessions</div>
+      ${sessHtml}
+    </div>` : ''}
+    ${ctxHtml}
+  `;
+
+  // Ouvrir le panneau automatiquement si des données existent
+  document.getElementById('mech-' + asset).classList.add('open');
+}
+
+/* ── 3. POINT D'ENTRÉE ────────────────────────────────────── */
 function applyMarketData() {
   if (typeof AUTO_MARKET_DATA === 'undefined') return;
 
@@ -1678,31 +2141,32 @@ function applyMarketData() {
     const d = AUTO_MARKET_DATA.assets[key];
     if (!d) return;
 
-    // Pré-remplir la cible seulement si le champ est vide
+    // Rendre le panneau mécanique
+    renderMechPanel(asset, d);
+
+    // Pré-remplir la cible si vide
     if (d.price) {
-      const targetEl = document.querySelector(
-        `[data-field="target"][data-asset="${asset}"]`
-      );
+      const targetEl = document.querySelector(`[data-field="target"][data-asset="${asset}"]`);
       if (targetEl && !targetEl.value) {
-        const val = d.price.toFixed(asset === 'BTC' ? 0 : 2);
+        const val = asset === 'BTC' ? String(Math.round(d.price)) : d.price.toFixed(2);
         targetEl.value = val;
         state.assets[asset].target = val;
       }
     }
 
-    // Niveaux auto frais (PDH, PDL, PWH, PWL)
+    // Injecter PDH/PDL/PWH/PWL dans les niveaux clés auto
     const autoLevels = [];
     if (d.pdh) autoLevels.push({ type:'PDH', price: d.pdh.toFixed(2), tf:'D', auto:true });
     if (d.pdl) autoLevels.push({ type:'PDL', price: d.pdl.toFixed(2), tf:'D', auto:true });
     if (d.pwh) autoLevels.push({ type:'PWH', price: d.pwh.toFixed(2), tf:'W', auto:true });
     if (d.pwl) autoLevels.push({ type:'PWL', price: d.pwl.toFixed(2), tf:'W', auto:true });
 
-    // Garder les niveaux manuels, remplacer les auto
     const manual = (state.assets[asset].levels || []).filter(l => !l.auto);
     state.assets[asset].levels = [...autoLevels, ...manual];
     renderLevels(asset);
   });
 
+  // Toast de confirmation
   showToast('📊 ' + AUTO_MARKET_DATA.generated_date
     + ' · ' + AUTO_MARKET_DATA.generated_time + ' — niveaux chargés');
 }
@@ -1710,56 +2174,7 @@ function applyMarketData() {
 
 <!-- MARKET_DATA:START -->
 <script id="auto-market-data">
-/* Auto-généré par GitHub Actions — 2026-04-01 19:19 (Paris) */
-const AUTO_MARKET_DATA = {
-  "generated_date": "2026-04-01",
-  "generated_time": "19:19",
-  "assets": {
-    "XAU": {
-      "price": 4820.2,
-      "pdh": 4684.1,
-      "pdl": 4508.6,
-      "pwh": 4551.9,
-      "pwl": 4100.8
-    },
-    "BTC": {
-      "price": 68732.0,
-      "pdh": 68495.0,
-      "pdl": 65950.0,
-      "pwh": 71986.0,
-      "pwl": 64972.0
-    },
-    "SP5": {
-      "price": 6606.9,
-      "pdh": 6539.05,
-      "pdl": 6395.88,
-      "pwh": 6651.62,
-      "pwl": 6356.08
-    },
-    "WTI": {
-      "price": 99.24,
-      "pdh": 106.86,
-      "pdl": 99.62,
-      "pwh": 101.67,
-      "pwl": 84.37
-    },
-    "DXY": {
-      "price": 99.348,
-      "pdh": 100.64,
-      "pdl": 99.81,
-      "pwh": 100.21,
-      "pwl": 98.88
-    },
-    "NAS": {
-      "price": 21971.66,
-      "pdh": 21642.62,
-      "pdl": 21063.38,
-      "pwh": 22189.34,
-      "pwl": 20909.93
-    }
-  }
-};
-applyMarketData();
+/* Ce bloc est remplacé automatiquement chaque matin par GitHub Actions. */
 </script>
 <!-- MARKET_DATA:END -->
 </body>
