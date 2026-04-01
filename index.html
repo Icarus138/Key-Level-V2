@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
@@ -66,6 +65,7 @@
   --xau:  #f59e0b;
   --btc:  #f97316;
   --sp5:  #22c55e;
+  --nas:  #a78bfa;
   --wti:  #6366f1;
   --dxy:  #3b82f6;
   --cus:  #a78bfa;
@@ -245,6 +245,7 @@ body {
 .asset-card[data-asset="XAU"]  { border-left: 3px solid var(--xau); }
 .asset-card[data-asset="BTC"]  { border-left: 3px solid var(--btc); }
 .asset-card[data-asset="SP5"]  { border-left: 3px solid var(--sp5); }
+.asset-card[data-asset="NAS"]  { border-left: 3px solid var(--nas); }
 .asset-card[data-asset="WTI"]  { border-left: 3px solid var(--wti); }
 .asset-card[data-asset="DXY"]  { border-left: 3px solid var(--dxy); }
 .asset-card[data-asset="CUS"]  { border-left: 3px solid var(--cus); }
@@ -272,6 +273,7 @@ body {
 .asset-card[data-asset="XAU"] .asset-pill { color: var(--xau); background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.22); }
 .asset-card[data-asset="BTC"] .asset-pill { color: var(--btc); background: rgba(249,115,22,.12); border: 1px solid rgba(249,115,22,.22); }
 .asset-card[data-asset="SP5"] .asset-pill { color: var(--sp5); background: rgba(34,197,94,.10); border: 1px solid rgba(34,197,94,.20); }
+.asset-card[data-asset="NAS"] .asset-pill { color: var(--nas); background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.24); }
 .asset-card[data-asset="WTI"] .asset-pill { color: var(--wti); background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.22); }
 .asset-card[data-asset="DXY"] .asset-pill { color: var(--dxy); background: rgba(59,130,246,.12); border: 1px solid rgba(59,130,246,.22); }
 .asset-card[data-asset="CUS"] .asset-pill { color: var(--cus); background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.22); }
@@ -480,7 +482,10 @@ body {
 .level-type-select[data-type="LIQ"]   { color: var(--lvl-liq); border-color: rgba(167,139,250,.25); background: rgba(167,139,250,.06); }
 .level-type-select[data-type="EQ"]    { color: var(--lvl-eq);  border-color: rgba(56,189,248,.25);  background: rgba(56,189,248,.06); }
 .level-type-select[data-type="PDH"]   { color: var(--lvl-pdh); border-color: rgba(244,114,182,.25); background: rgba(244,114,182,.06); }
+.level-type-select[data-type="PDL"]   { color: var(--lvl-sup);  border-color: rgba(74,222,128,.22);  background: rgba(74,222,128,.05); }
 .level-type-select[data-type="PWH"]   { color: var(--lvl-pdh); border-color: rgba(244,114,182,.20); background: rgba(244,114,182,.04); }
+.level-type-select[data-type="PWL"]   { color: var(--lvl-sup);  border-color: rgba(74,222,128,.16);  background: rgba(74,222,128,.03); }
+.level-type-select[data-type="AUTO"]  { color: var(--amber);   border-color: rgba(245,158,11,.25);  background: rgba(245,158,11,.06); }
 .level-type-select[data-type="OTHER"] { color: var(--lvl-other); }
 
 /* Prix */
@@ -703,7 +708,6 @@ body {
   .level-row { grid-template-columns: 58px 1fr 70px 26px; }
 }
 </style>
-
 </head>
 
 <body>
@@ -712,7 +716,6 @@ body {
 <!-- ================================================================
      HEADER
 ================================================================ -->
-
 <header class="site-header">
   <div class="header-left">
     <div class="header-eyebrow">ICT · SMC · Daily Brief</div>
@@ -729,7 +732,6 @@ body {
 <!-- ================================================================
      ACTIONS GLOBALES
 ================================================================ -->
-
 <div class="global-actions">
   <button class="btn btn-primary" id="btn-save">&#10003;&nbsp; Sauvegarder</button>
   <button class="btn btn-ghost"   id="btn-export">&#8615;&nbsp; Exporter texte</button>
@@ -739,11 +741,9 @@ body {
 <!-- ================================================================
      GRILLE ACTIFS
 ================================================================ -->
-
 <div class="asset-grid" id="asset-grid">
 
   <!-- GOLD -->
-
   <div class="asset-card" data-asset="XAU" id="card-XAU">
     <div class="card-header">
       <span class="asset-pill">XAU/USD</span>
@@ -751,113 +751,110 @@ body {
     </div>
     <div class="card-body">
 
-```
-  <!-- Bias HTF -->
-  <div class="bias-section">
-    <div class="section-label">Bias HTF</div>
-    <div class="bias-row" data-asset="XAU">
-      <div class="bias-cell">
-        <div class="bias-tf-label">Monthly</div>
-        <select class="bias-select" data-tf="M" data-asset="XAU">
-          <option value="">—</option>
-          <option value="bull">&#9650; Bull</option>
-          <option value="bear">&#9660; Bear</option>
-          <option value="neut">&#9632; Neut</option>
-        </select>
+      <!-- Bias HTF -->
+      <div class="bias-section">
+        <div class="section-label">Bias HTF</div>
+        <div class="bias-row" data-asset="XAU">
+          <div class="bias-cell">
+            <div class="bias-tf-label">Monthly</div>
+            <select class="bias-select" data-tf="M" data-asset="XAU">
+              <option value="">—</option>
+              <option value="bull">&#9650; Bull</option>
+              <option value="bear">&#9660; Bear</option>
+              <option value="neut">&#9632; Neut</option>
+            </select>
+          </div>
+          <div class="bias-cell">
+            <div class="bias-tf-label">Weekly</div>
+            <select class="bias-select" data-tf="W" data-asset="XAU">
+              <option value="">—</option>
+              <option value="bull">&#9650; Bull</option>
+              <option value="bear">&#9660; Bear</option>
+              <option value="neut">&#9632; Neut</option>
+            </select>
+          </div>
+          <div class="bias-cell">
+            <div class="bias-tf-label">Daily</div>
+            <select class="bias-select" data-tf="D" data-asset="XAU">
+              <option value="">—</option>
+              <option value="bull">&#9650; Bull</option>
+              <option value="bear">&#9660; Bear</option>
+              <option value="neut">&#9632; Neut</option>
+            </select>
+          </div>
+          <div class="bias-cell">
+            <div class="bias-tf-label">H4</div>
+            <select class="bias-select" data-tf="H4" data-asset="XAU">
+              <option value="">—</option>
+              <option value="bull">&#9650; Bull</option>
+              <option value="bear">&#9660; Bear</option>
+              <option value="neut">&#9632; Neut</option>
+            </select>
+          </div>
+        </div>
       </div>
-      <div class="bias-cell">
-        <div class="bias-tf-label">Weekly</div>
-        <select class="bias-select" data-tf="W" data-asset="XAU">
-          <option value="">—</option>
-          <option value="bull">&#9650; Bull</option>
-          <option value="bear">&#9660; Bear</option>
-          <option value="neut">&#9632; Neut</option>
-        </select>
+
+      <!-- State D -->
+      <div class="stated-section">
+        <div class="section-label">State D — Dynamique du prix</div>
+        <div class="stated-row">
+          <div class="stated-cell">
+            <div class="stated-cell-label">Structure</div>
+            <select class="select-field" data-field="structure" data-asset="XAU">
+              <option value="">—</option>
+              <option value="BOS haussier">BOS Haussier</option>
+              <option value="BOS baissier">BOS Baissier</option>
+              <option value="CHoCH haussier">CHoCH Haussier</option>
+              <option value="CHoCH baissier">CHoCH Baissier</option>
+              <option value="Range consolidation">Range / Consolidation</option>
+              <option value="Distribution">Distribution</option>
+              <option value="Accumulation">Accumulation</option>
+            </select>
+          </div>
+          <div class="stated-cell">
+            <div class="stated-cell-label">Phase de marché</div>
+            <select class="select-field" data-field="phase" data-asset="XAU">
+              <option value="">—</option>
+              <option value="Expansion">Expansion</option>
+              <option value="Retracement">Retracement</option>
+              <option value="Reversal">Reversal</option>
+              <option value="Consolidation">Consolidation</option>
+              <option value="Range">Range</option>
+            </select>
+          </div>
+          <div class="stated-cell">
+            <div class="stated-cell-label">Zone de prix</div>
+            <select class="select-field" data-field="zone" data-asset="XAU">
+              <option value="">—</option>
+              <option value="Premium">Premium</option>
+              <option value="Equilibrium">Equilibrium (50%)</option>
+              <option value="Discount">Discount</option>
+            </select>
+          </div>
+          <div class="stated-cell">
+            <div class="stated-cell-label">Cible prioritaire</div>
+            <input type="text" class="input-field" data-field="target" data-asset="XAU" placeholder="Ex : 2650"/>
+          </div>
+        </div>
       </div>
-      <div class="bias-cell">
-        <div class="bias-tf-label">Daily</div>
-        <select class="bias-select" data-tf="D" data-asset="XAU">
-          <option value="">—</option>
-          <option value="bull">&#9650; Bull</option>
-          <option value="bear">&#9660; Bear</option>
-          <option value="neut">&#9632; Neut</option>
-        </select>
+
+      <!-- Niveaux clés -->
+      <div class="levels-section">
+        <div class="levels-header">
+          <div class="section-label" style="margin:0">Niveaux clés actifs</div>
+          <button class="btn-add-level" data-asset="XAU">+ Ajouter</button>
+        </div>
+        <div class="levels-table" id="levels-XAU"></div>
       </div>
-      <div class="bias-cell">
-        <div class="bias-tf-label">H4</div>
-        <select class="bias-select" data-tf="H4" data-asset="XAU">
-          <option value="">—</option>
-          <option value="bull">&#9650; Bull</option>
-          <option value="bear">&#9660; Bear</option>
-          <option value="neut">&#9632; Neut</option>
-        </select>
-      </div>
+
+      <!-- Note -->
+      <textarea class="asset-note" data-field="note" data-asset="XAU" placeholder="Notes libres : contexte, invalidation, observations…" rows="2"></textarea>
+
     </div>
-  </div>
-
-  <!-- State D -->
-  <div class="stated-section">
-    <div class="section-label">State D — Dynamique du prix</div>
-    <div class="stated-row">
-      <div class="stated-cell">
-        <div class="stated-cell-label">Structure</div>
-        <select class="select-field" data-field="structure" data-asset="XAU">
-          <option value="">—</option>
-          <option value="BOS haussier">BOS Haussier</option>
-          <option value="BOS baissier">BOS Baissier</option>
-          <option value="CHoCH haussier">CHoCH Haussier</option>
-          <option value="CHoCH baissier">CHoCH Baissier</option>
-          <option value="Range consolidation">Range / Consolidation</option>
-          <option value="Distribution">Distribution</option>
-          <option value="Accumulation">Accumulation</option>
-        </select>
-      </div>
-      <div class="stated-cell">
-        <div class="stated-cell-label">Phase de marché</div>
-        <select class="select-field" data-field="phase" data-asset="XAU">
-          <option value="">—</option>
-          <option value="Expansion">Expansion</option>
-          <option value="Retracement">Retracement</option>
-          <option value="Reversal">Reversal</option>
-          <option value="Consolidation">Consolidation</option>
-          <option value="Range">Range</option>
-        </select>
-      </div>
-      <div class="stated-cell">
-        <div class="stated-cell-label">Zone de prix</div>
-        <select class="select-field" data-field="zone" data-asset="XAU">
-          <option value="">—</option>
-          <option value="Premium">Premium</option>
-          <option value="Equilibrium">Equilibrium (50%)</option>
-          <option value="Discount">Discount</option>
-        </select>
-      </div>
-      <div class="stated-cell">
-        <div class="stated-cell-label">Cible prioritaire</div>
-        <input type="text" class="input-field" data-field="target" data-asset="XAU" placeholder="Ex : 2650"/>
-      </div>
-    </div>
-  </div>
-
-  <!-- Niveaux clés -->
-  <div class="levels-section">
-    <div class="levels-header">
-      <div class="section-label" style="margin:0">Niveaux clés actifs</div>
-      <button class="btn-add-level" data-asset="XAU">+ Ajouter</button>
-    </div>
-    <div class="levels-table" id="levels-XAU"></div>
-  </div>
-
-  <!-- Note -->
-  <textarea class="asset-note" data-field="note" data-asset="XAU" placeholder="Notes libres : contexte, invalidation, observations…" rows="2"></textarea>
-
-</div>
-```
-
   </div><!-- /XAU -->
 
-  <!-- BTC -->
 
+  <!-- BTC -->
   <div class="asset-card" data-asset="BTC" id="card-BTC">
     <div class="card-header">
       <span class="asset-pill">BTC/USD</span>
@@ -931,8 +928,8 @@ body {
     </div>
   </div><!-- /BTC -->
 
-  <!-- SP500 -->
 
+  <!-- SP500 -->
   <div class="asset-card" data-asset="SP5" id="card-SP5">
     <div class="card-header">
       <span class="asset-pill">SP500</span>
@@ -984,8 +981,61 @@ body {
     </div>
   </div><!-- /SP5 -->
 
-  <!-- WTI -->
 
+  <!-- NASDAQ -->
+  <div class="asset-card" data-asset="NAS" id="card-NAS">
+    <div class="card-header">
+      <span class="asset-pill">NASDAQ</span>
+      <span class="asset-fullname">Nasdaq Composite</span>
+    </div>
+    <div class="card-body">
+      <div class="bias-section">
+        <div class="section-label">Bias HTF</div>
+        <div class="bias-row" data-asset="NAS">
+          <div class="bias-cell"><div class="bias-tf-label">Monthly</div>
+            <select class="bias-select" data-tf="M" data-asset="NAS"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">Weekly</div>
+            <select class="bias-select" data-tf="W" data-asset="NAS"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">Daily</div>
+            <select class="bias-select" data-tf="D" data-asset="NAS"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+          <div class="bias-cell"><div class="bias-tf-label">H4</div>
+            <select class="bias-select" data-tf="H4" data-asset="NAS"><option value="">—</option><option value="bull">&#9650; Bull</option><option value="bear">&#9660; Bear</option><option value="neut">&#9632; Neut</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="stated-section">
+        <div class="section-label">State D — Dynamique du prix</div>
+        <div class="stated-row">
+          <div class="stated-cell"><div class="stated-cell-label">Structure</div>
+            <select class="select-field" data-field="structure" data-asset="NAS"><option value="">—</option><option>BOS Haussier</option><option>BOS Baissier</option><option>CHoCH Haussier</option><option>CHoCH Baissier</option><option>Range / Consolidation</option><option>Distribution</option><option>Accumulation</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Phase de marché</div>
+            <select class="select-field" data-field="phase" data-asset="NAS"><option value="">—</option><option>Expansion</option><option>Retracement</option><option>Reversal</option><option>Consolidation</option><option>Range</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Zone de prix</div>
+            <select class="select-field" data-field="zone" data-asset="NAS"><option value="">—</option><option>Premium</option><option>Equilibrium (50%)</option><option>Discount</option></select>
+          </div>
+          <div class="stated-cell"><div class="stated-cell-label">Cible prioritaire</div>
+            <input type="text" class="input-field" data-field="target" data-asset="NAS" placeholder="Ex : 17800"/>
+          </div>
+        </div>
+      </div>
+      <div class="levels-section">
+        <div class="levels-header">
+          <div class="section-label" style="margin:0">Niveaux clés actifs</div>
+          <button class="btn-add-level" data-asset="NAS">+ Ajouter</button>
+        </div>
+        <div class="levels-table" id="levels-NAS"></div>
+      </div>
+      <textarea class="asset-note" data-field="note" data-asset="NAS" placeholder="Notes libres…" rows="2"></textarea>
+    </div>
+  </div><!-- /NAS -->
+
+
+  <!-- WTI -->
   <div class="asset-card" data-asset="WTI" id="card-WTI">
     <div class="card-header">
       <span class="asset-pill">WTI</span>
@@ -1037,8 +1087,8 @@ body {
     </div>
   </div><!-- /WTI -->
 
-  <!-- DXY -->
 
+  <!-- DXY -->
   <div class="asset-card" data-asset="DXY" id="card-DXY">
     <div class="card-header">
       <span class="asset-pill">DXY</span>
@@ -1090,8 +1140,8 @@ body {
     </div>
   </div><!-- /DXY -->
 
-  <!-- CUSTOM -->
 
+  <!-- CUSTOM -->
   <div class="asset-card" data-asset="CUS" id="card-CUS">
     <div class="card-header">
       <span class="asset-pill">AUTRE</span>
@@ -1145,10 +1195,10 @@ body {
 
 </div><!-- /asset-grid -->
 
+
 <!-- ================================================================
      RÉSUMÉ GLOBAL + NOTE DE SESSION
 ================================================================ -->
-
 <div class="summary-card" id="summary-card">
   <div class="summary-header" id="summary-toggle">
     <span class="summary-title">&#9776;&nbsp; Résumé global &amp; Note de session</span>
@@ -1187,12 +1237,11 @@ body {
 <!-- ================================================================
      JAVASCRIPT
 ================================================================ -->
-
 <script>
 /* ================================================================
    CONFIG — liste des actifs et leurs clés localStorage
 ================================================================ */
-const ASSETS = ['XAU','BTC','SP5','WTI','DXY','CUS'];
+const ASSETS = ['XAU','BTC','SP5','NAS','WTI','DXY','CUS'];
 
 // Options des types de niveaux
 // PERSONNALISATION : modifier ce tableau pour ajouter/retirer des types
@@ -1205,7 +1254,9 @@ const LEVEL_TYPES = [
   { val:'LIQ',   label:'LIQ' },
   { val:'EQ',    label:'EQ'  },
   { val:'PDH',   label:'PDH' },
+  { val:'PDL',   label:'PDL' },
   { val:'PWH',   label:'PWH' },
+  { val:'PWL',   label:'PWL' },
   { val:'OTHER', label:'...' },
 ];
 
@@ -1407,7 +1458,7 @@ document.getElementById('session-note').addEventListener('input', function() {
 /* ================================================================
    RÉSUMÉ TABLE (auto-refresh)
 ================================================================ */
-const ASSET_LABELS = { XAU:'XAU/USD', BTC:'BTC/USD', SP5:'SP500', WTI:'WTI', DXY:'DXY', CUS:'—' };
+const ASSET_LABELS = { XAU:'XAU/USD', BTC:'BTC/USD', SP5:'SP500', NAS:'NASDAQ', WTI:'WTI', DXY:'DXY', CUS:'—' };
 
 function biasCell(val) {
   if (!val) return '<span style="color:var(--t4)">—</span>';
@@ -1609,7 +1660,64 @@ document.getElementById('btn-export').addEventListener('click', () => {
 ================================================================ */
 ASSETS.forEach(a => renderLevels(a));
 loadState();
+
+/* Appel après loadState : les niveaux auto sont injectés si c'est un nouveau jour */
+applyMarketData();
+
+/* ================================================================
+   AUTO MARKET DATA — lecture du bloc injecté par GitHub Actions
+================================================================ */
+function applyMarketData() {
+  // AUTO_MARKET_DATA est injecté par le script Python via GitHub Actions
+  if (typeof AUTO_MARKET_DATA === 'undefined') return;
+
+  const today    = AUTO_MARKET_DATA.generated_date;
+  const lastAuto = localStorage.getItem('klg_last_auto_date');
+
+  // N'appliquer que si c'est un nouveau jour (évite d'écraser les éditions manuelles)
+  if (lastAuto === today) return;
+
+  const MAP = { XAU:'XAU', BTC:'BTC', SP5:'SP5', NAS:'NAS', WTI:'WTI', DXY:'DXY' };
+
+  Object.entries(MAP).forEach(([key, asset]) => {
+    const d = AUTO_MARKET_DATA.assets[key];
+    if (!d) return;
+
+    // Pré-remplir la cible avec le prix de clôture
+    if (d.price) {
+      const targetEl = document.querySelector(`[data-field="target"][data-asset="${asset}"]`);
+      if (targetEl) { targetEl.value = d.price.toFixed(2); state.assets[asset].target = String(d.price.toFixed(2)); }
+    }
+
+    // Construire les niveaux auto (PDH, PDL, PWH, PWL)
+    const autoLevels = [];
+    if (d.pdh) autoLevels.push({ type:'PDH', price: String(d.pdh.toFixed(2)), tf:'D', auto:true });
+    if (d.pdl) autoLevels.push({ type:'PDL', price: String(d.pdl.toFixed(2)), tf:'D', auto:true });
+    if (d.pwh) autoLevels.push({ type:'PWH', price: String(d.pwh.toFixed(2)), tf:'W', auto:true });
+    if (d.pwl) autoLevels.push({ type:'PWL', price: String(d.pwl.toFixed(2)), tf:'W', auto:true });
+
+    // Fusionner : garder les niveaux manuels existants + ajouter les auto
+    const manual = (state.assets[asset].levels || []).filter(l => !l.auto);
+    state.assets[asset].levels = [...autoLevels, ...manual];
+    renderLevels(asset);
+  });
+
+  // Marquer cette date comme déjà appliquée
+  localStorage.setItem('klg_last_auto_date', today);
+  saveState();
+
+  // Notification visible
+  showToast('📊 Données auto chargées — ' + AUTO_MARKET_DATA.generated_date
+    + ' ' + AUTO_MARKET_DATA.generated_time);
+}
 </script>
 
+<!-- MARKET_DATA:START -->
+<script id="auto-market-data">
+/* Ce bloc est remplacé automatiquement chaque matin par GitHub Actions.
+   Tant qu'il n'a pas tourné une première fois, AUTO_MARKET_DATA n'est pas défini
+   et applyMarketData() s'arrête immédiatement — aucun effet. */
+</script>
+<!-- MARKET_DATA:END -->
 </body>
 </html>
